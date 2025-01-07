@@ -17,6 +17,7 @@ class User extends Authenticatable
 
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory;
+
     use HasProfilePhoto;
     use HasTeams;
     use Notifiable;
@@ -30,6 +31,12 @@ class User extends Authenticatable
     protected $fillable = [
         'name',
         'email',
+        'id_number',
+        'phone',
+        'address',
+        'city',
+        'state',
+        'country',
         'password',
     ];
 
@@ -65,5 +72,21 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    /**
+     *  HasMany relationship with Loan model
+     */
+    public function loans()
+    {
+        return $this->hasMany(Loan::class);
+    }
+
+    /**
+     * HasManyThrough relationship with Payment model
+     */
+    public function payments()
+    {
+        return $this->hasManyThrough(Payment::class, Loan::class, 'user_id', 'loan_id', 'id', 'id');
     }
 }
