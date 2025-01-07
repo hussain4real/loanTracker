@@ -8,6 +8,7 @@ enum LoanStatus: string implements HasLabel
 {
     case PENDING = 'Pending';
     case APPROVED = 'Approved';
+    case ACTIVE = 'Active';
     case REJECTED = 'Rejected';
     case COMPLETED = 'Completed';
     case CANCELLED = 'Cancelled';

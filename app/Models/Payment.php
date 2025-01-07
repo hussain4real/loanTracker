@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\PaymentMethod;
 use App\Enums\PaymentStatus;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -28,7 +29,7 @@ class Payment extends Model
             'amount' => 'decimal:15,3',
             'payment_date' => 'date',
             'due_date' => 'date',
-
+            'payment_method' => PaymentMethod::class,
             'status' => PaymentStatus::class,
         ];
     }
