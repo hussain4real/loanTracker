@@ -43,7 +43,7 @@ class Loan extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function paymnets()
+    public function payments()
     {
         return $this->hasMany(Payment::class);
     }
@@ -66,7 +66,45 @@ class Loan extends Model
     {
         return Attribute::make(
             get: function () {
-                return $this->amount / $this->duration ?? 12;
+                if (! $this->duration || $this->duration === 0) {
+                    return 0;
+                }
+
+                return round($this->amount / $this->duration, 3);
+            }
+        )->shouldCache();
+    }
+
+    protected function completionPercentage(): Attribute
+    {
+        return Attribute::make(
+            get: function () {
+                if ($this->amount === 0) {
+                    return 0;
+                }
+
+                return round(
+                    ($this->payments()
+                        ->where('status', PaymentStatus::COMPLETED)
+                        ->sum('amount') / $this->amount) * 100,
+                    2
+                );
+            }
+        )->shouldCache();
+    }
+
+    protected function nextPaymentDate(): Attribute
+    {
+        return Attribute::make(
+            get: function () {
+                if ($this->status !== LoanStatus::ACTIVE) {
+                    return null;
+                }
+
+                return $this->payments()
+                    ->where('status', PaymentStatus::PENDING)
+                    ->orderBy('due_date')
+                    ->value('due_date');
             }
         )->shouldCache();
     }
