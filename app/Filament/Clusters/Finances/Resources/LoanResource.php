@@ -14,6 +14,8 @@ use Filament\Forms\Set;
 use Filament\Pages\SubNavigationPosition;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Tables\Columns\Layout\Stack;
+use Filament\Tables\Columns\Layout\View;
 use Filament\Tables\Table;
 
 class LoanResource extends Resource
@@ -86,44 +88,58 @@ class LoanResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('user.name')
-
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('amount')
-                    ->numeric()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('purpose')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('status')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('approved_at')
-                    ->date()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('due_date')
-                    ->date()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('duration')
-                    ->numeric()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('updated_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                Stack::make([
+                    View::make('filament.tables.loan')
+                        ->components([
+                            Tables\Columns\TextColumn::make('user.name')
+                                ->searchable()
+                                ->sortable(),
+                            Tables\Columns\TextColumn::make('amount')
+                                ->numeric()
+                                ->sortable(),
+                            Tables\Columns\TextColumn::make('purpose')
+                                ->searchable(),
+                            Tables\Columns\TextColumn::make('status')
+                                ->searchable()
+                                ->sortable(),
+                            Tables\Columns\TextColumn::make('approved_at')
+                                ->date()
+                                ->sortable(),
+                            Tables\Columns\TextColumn::make('due_date')
+                                ->date()
+                                ->sortable(),
+                            Tables\Columns\TextColumn::make('duration')
+                                ->numeric()
+                                ->sortable(),
+                            Tables\Columns\TextColumn::make('created_at')
+                                ->dateTime()
+                                ->sortable()
+                                ->toggleable(isToggledHiddenByDefault: true),
+                            Tables\Columns\TextColumn::make('updated_at')
+                                ->dateTime()
+                                ->sortable()
+                                ->toggleable(isToggledHiddenByDefault: true),
+                        ]),
+                ])
+                    ->extraAttributes(['id' => 'hello']),
             ])
+
+            ->contentGrid([
+                'md' => 2,
+                'xl' => 3,
+            ])
+            ->persistSearchInSession()
+            ->persistColumnSearchesInSession()
             ->filters([
                 //
             ])
             ->actions([
-                Tables\Actions\ViewAction::make(),
-                Tables\Actions\EditAction::make(),
+                // Tables\Actions\ViewAction::make(),
+                // Tables\Actions\EditAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                    // Tables\Actions\DeleteBulkAction::make(),
                 ]),
             ]);
     }

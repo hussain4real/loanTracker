@@ -106,10 +106,16 @@ class Loan extends Model
                     return null;
                 }
 
-                return $this->payments()
-                    ->where('status', PaymentStatus::PENDING)
-                    ->orderBy('due_date')
-                    ->value('due_date');
+                // Get payment schedule
+                $schedule = $this->payment_schedule ?? [];
+
+                // Find the next pending payment from the schedule
+                $nextPayment = collect($schedule)
+                    ->where('status', PaymentStatus::PENDING->value)
+                    ->sortBy('due_date')
+                    ->first();
+
+                return $nextPayment ? Carbon::parse($nextPayment['due_date']) : null;
             }
         )->shouldCache();
     }
