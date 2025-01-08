@@ -10,7 +10,6 @@ enum LoanStatus: string implements HasColor, HasLabel
 {
     case PENDING = 'Pending';
     case APPROVED = 'Approved';
-    case ACTIVE = 'Active';
     case REJECTED = 'Rejected';
     case COMPLETED = 'Completed';
     case CANCELLED = 'Cancelled';
@@ -27,7 +26,6 @@ enum LoanStatus: string implements HasColor, HasLabel
         return match ($this) {
             self::PENDING => 'gray',
             self::APPROVED => Color::Blue,
-            self::ACTIVE => Color::Lime,
             self::REJECTED => 'danger',
             self::COMPLETED => Color::Green,
             self::CANCELLED => 'danger',

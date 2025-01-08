@@ -27,7 +27,7 @@ class LoanFactory extends Factory
             'user_id' => \App\Models\User::factory(),
             'amount' => $this->faker->randomFloat(3, 1000, 10000),
             'purpose' => $purpose,
-            'status' => LoanStatus::ACTIVE,
+            'status' => LoanStatus::APPROVED,
             'approved_at' => $this->faker->dateTimeBetween('-3 month', 'now'),
             'due_date' => $this->faker->dateTimeBetween($approved_at, '+1 year'),
             'duration' => $this->faker->numberBetween(6, 12),

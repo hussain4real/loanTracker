@@ -6,10 +6,12 @@ use App\Enums\LoanStatus;
 use App\Enums\PaymentStatus;
 use App\Enums\Purpose;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+#[ObservedBy(\App\Observers\LoanObserver::class)]
 class Loan extends Model
 {
     /** @use HasFactory<\Database\Factories\LoanFactory> */
@@ -22,6 +24,7 @@ class Loan extends Model
         'status',
         'approved_at',
         'due_date',
+        'duration',
         'payment_schedule',
     ];
 
@@ -56,7 +59,6 @@ class Loan extends Model
                 return $this->amount - $this->payments()
                     ->where('status', PaymentStatus::COMPLETED)
                     ->sum('amount');
-
             }
         )->shouldCache();
     }
@@ -100,7 +102,7 @@ class Loan extends Model
     {
         return Attribute::make(
             get: function () {
-                if ($this->status !== LoanStatus::ACTIVE) {
+                if ($this->status !== LoanStatus::APPROVED) {
                     return null;
                 }
 
@@ -135,6 +137,10 @@ class Loan extends Model
     // Generate payment schedule
     public function generatePaymentSchedule(): array
     {
+        if (! empty($this->payment_schedule)) {
+            return $this->payment_schedule;
+        }
+
         $schedule = [];
         $monthlyPayment = $this->monthly_installment;
         $startDate = Carbon::parse($this->approved_at);
@@ -155,6 +161,20 @@ class Loan extends Model
         return $schedule;
     }
 
+    public function approve(): void
+    {
+        if ($this->status === LoanStatus::PENDING) {
+            $this->status = LoanStatus::APPROVED;
+            $this->approved_at = now();
+            $this->save();
+
+            // Generate payment schedule if it doesn't exist
+            if (empty($this->payment_schedule)) {
+                $this->generatePaymentSchedule();
+            }
+        }
+    }
+
     // Update loan status based on payments and due dates
     public function updateLoanStatus(): void
     {
@@ -170,7 +190,7 @@ class Loan extends Model
             $pendingPayments === 0 => LoanStatus::COMPLETED,
             $overduePayments > 0 => LoanStatus::OVERDUE,
             $overduePayments > 3 => LoanStatus::DEFAULTED,
-            default => LoanStatus::ACTIVE,
+            default => LoanStatus::APPROVED,
         };
         $this->save();
     }

@@ -10,6 +10,7 @@ use App\Models\Loan;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Forms\Get;
+use Filament\Forms\Set;
 use Filament\Pages\SubNavigationPosition;
 use Filament\Resources\Resource;
 use Filament\Tables;
@@ -30,14 +31,13 @@ class LoanResource extends Resource
         return $form
             ->schema([
                 Forms\Components\Select::make('user_id')
-                    ->relationship(name: 'user', titleAttribute: 'name', ignoreRecord: true)
-                    ->searchable()
-                    ->preload()
+                    ->relationship(name: 'user', titleAttribute: 'name', modifyQueryUsing: fn ($query) => $query->where('id', '!=', auth()->id()))
+
                     ->createOptionForm([
                         Forms\Components\TextInput::make('name')
                             ->required(),
                         Forms\Components\Hidden::make('email')
-                            ->afterStateUpdated(function ($state, Get $get) {
+                            ->default(function ($state, Get $get) {
 
                                 return $get('name').rand(1000, 9999).'@loanee.com';
                             }),
@@ -50,18 +50,35 @@ class LoanResource extends Resource
                         Forms\Components\TextInput::make('address')
                             ->label('Physical Address'),
 
-                    ]),
+                    ])
+                    ->searchable()
+                    ->preload(),
                 Forms\Components\TextInput::make('amount')
                     ->numeric(),
                 Forms\Components\Select::make('purpose')
                     ->options(Purpose::class),
                 Forms\Components\Select::make('status')
-                    ->options(LoanStatus::class),
-                Forms\Components\DatePicker::make('approved_at'),
-                Forms\Components\DatePicker::make('due_date'),
+                    ->options(LoanStatus::class)
+                    ->live(onBlur: true),
+                // Forms\Components\DatePicker::make('approved_at')
+                //     ->visible(fn (Get $get) => $get('status') === LoanStatus::APPROVED->value || $get('status') === LoanStatus::ACTIVE->value),
                 Forms\Components\TextInput::make('duration')
                     ->numeric()
-                    ->suffix('months'),
+                    ->suffix('months')
+                    ->live(onBlur: true)
+                    ->afterStateUpdated(function (Set $set, $state, Get $get) {
+                        logger('After state updated triggered.', [$state]);
+                        $duration = (int) $state; // Ensure the value is cast to an integer
+                        logger('Duration', [$duration]);
+                        $dueDate = now()->addMonths($duration)->startOfDay()->format('Y-m-d');
+                        logger('Due Date', [$dueDate]);
+                        if ($duration > 0) {
+                            $set('due_date', $dueDate);
+                        } else {
+                            $set('due_date', null); // Handle invalid or zero duration
+                        }
+                    }),
+                Forms\Components\DatePicker::make('due_date'),
             ]);
     }
 
@@ -69,8 +86,8 @@ class LoanResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('user_id')
-                    ->numeric()
+                Tables\Columns\TextColumn::make('user.name')
+
                     ->sortable(),
                 Tables\Columns\TextColumn::make('amount')
                     ->numeric()
