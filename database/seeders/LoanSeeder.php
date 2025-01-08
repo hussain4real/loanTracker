@@ -2,7 +2,7 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use App\Models\Loan;
 use Illuminate\Database\Seeder;
 
 class LoanSeeder extends Seeder
@@ -12,6 +12,11 @@ class LoanSeeder extends Seeder
      */
     public function run(): void
     {
-        //
+        Loan::factory()
+            ->count(20)
+            ->create()
+            ->each(function (Loan $loan) {
+                $loan->generatePaymentSchedule();
+            });
     }
 }

@@ -28,7 +28,7 @@ class Loan extends Model
     protected function casts(): array
     {
         return [
-            'amount' => 'decimal:15,3',
+            'amount' => 'decimal:3',
             'status' => LoanStatus::class,
             'purpose' => Purpose::class,
             'due_date' => 'date',
@@ -70,7 +70,10 @@ class Loan extends Model
                     return 0;
                 }
 
-                return round($this->amount / $this->duration, 3);
+                $amount = floatval($this->amount);
+                $duration = intval($this->duration);
+
+                return round($amount / $duration, 3);
             }
         )->shouldCache();
     }
