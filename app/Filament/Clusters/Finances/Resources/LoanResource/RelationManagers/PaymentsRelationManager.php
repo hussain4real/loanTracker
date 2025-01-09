@@ -10,6 +10,7 @@ use Filament\Forms;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Form;
 use Filament\Forms\Get;
+use Filament\Notifications\Notification;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Columns\TextColumn;
@@ -138,25 +139,57 @@ class PaymentsRelationManager extends RelationManager
                     ->before(function (Tables\Actions\CreateAction $action, array $data) {
                         $loan = $this->getOwnerRecord();
                         $paymentSchedule = $loan->payment_schedule ?? [];
-                        // compare the month of the first pending payment in the schedule with the  month in the data
-                        $month = collect($paymentSchedule)->firstWhere('status', PaymentStatus::PENDING);
-                        if ($month && $month['month'] === $data['month']) {
 
-                            // update the payment schedule to mark the payment as completed if the data amount is equal to the pending amount in the schedule
-                            $updatedSchedule = collect($paymentSchedule)->map(function ($payment) use ($data) {
+                        // Check total payments against loan amount
+                        $totalPaid = $loan->payments()
+                            ->where('status', PaymentStatus::COMPLETED)
+                            ->sum('amount');
+
+                        if (($totalPaid + $data['amount']) > $loan->amount) {
+                            Notification::make()
+                                ->warning()
+                                ->title('Payment exceeds loan amount')
+                                ->send();
+                            $action->halt();
+                        }
+
+                        // Find scheduled payment for month
+                        $scheduledPayment = collect($paymentSchedule)
+                            ->firstWhere('month', $data['month']);
+
+                        if (! $scheduledPayment) {
+                            Notification::make()
+                                ->warning()
+                                ->title('Invalid payment month')
+                                ->send();
+                            $action->halt();
+                        }
+
+                        // Get total paid for this month
+                        $monthlyPaid = $loan->payments()
+                            ->where('month', $data['month'])
+                            ->where('status', PaymentStatus::COMPLETED)
+                            ->sum('amount');
+
+                        // Update schedule status
+                        $updatedSchedule = collect($paymentSchedule)
+                            ->map(function ($payment) use ($data, $monthlyPaid) {
                                 if ($payment['month'] === $data['month']) {
+                                    $totalPaidForMonth = $monthlyPaid + $data['amount'];
+
                                     return array_merge($payment, [
-                                        'status' => PaymentStatus::COMPLETED->value,
+                                        'status' => $totalPaidForMonth >= $payment['amount']
+                                            ? PaymentStatus::COMPLETED->value
+                                            : PaymentStatus::PENDING->value,
+                                        'paid_amount' => $totalPaidForMonth,
                                     ]);
                                 }
 
                                 return $payment;
-                            })->toArray();
+                            })
+                            ->toArray();
 
-                            $loan->forceFill(['payment_schedule' => $updatedSchedule])->saveQuietly();
-                        } else {
-                            dd('Payment cannot be created');
-                        }
+                        $loan->forceFill(['payment_schedule' => $updatedSchedule])->saveQuietly();
                     }),
                 // Tables\Actions\AssociateAction::make(),
             ])
