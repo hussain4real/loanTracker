@@ -2,13 +2,14 @@
 
 namespace App\Filament\Clusters\Finances\Resources\LoanResource\RelationManagers;
 
+use App\Enums\Month;
+use App\Enums\PaymentMethod;
+use App\Enums\PaymentStatus;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class PaymentsRelationManager extends RelationManager
 {
@@ -18,9 +19,43 @@ class PaymentsRelationManager extends RelationManager
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('id')
+                Forms\Components\TextInput::make('amount')
                     ->required()
-                    ->maxLength(255),
+                    ->numeric(),
+                Forms\Components\Select::make('month')
+                    ->options(function () {
+                        $loan = $this->getOwnerRecord();
+                        $paymentSchedule = $loan->payment_schedule ?? [];
+                        // get the first month in the payment schedule where the status is pending
+                        $month = collect($paymentSchedule)->firstWhere('status', PaymentStatus::PENDING);
+
+                        return $month ? [$month['month'] => $month['month']] : Month::class;
+                    })
+                    ->default(function () {
+                        $loan = $this->getOwnerRecord();
+                        $paymentSchedule = $loan->payment_schedule ?? [];
+                        // get the first month in the payment schedule where the status is pending
+                        $month = collect($paymentSchedule)->firstWhere('status', PaymentStatus::PENDING);
+
+                        return $month ? $month['month'] : null;
+                    }),
+                Forms\Components\Select::make('payment_method')
+                    ->options(PaymentMethod::class),
+                Forms\Components\TextInput::make('received_bank'),
+                Forms\Components\TextInput::make('payment_reference'),
+                Forms\Components\Datepicker::make('due_date')
+                    ->default(function () {
+                        $loan = $this->getOwnerRecord();
+                        $paymentSchedule = $loan->payment_schedule ?? [];
+                        // get the first month in the payment schedule where the status is pending
+                        $month = collect($paymentSchedule)->firstWhere('status', PaymentStatus::PENDING);
+
+                        return $month ? $month['due_date'] : null;
+                    }),
+                Forms\Components\ToggleButtons::make('status')
+                    ->options(PaymentStatus::class)
+                    ->inline()
+                    ->default(PaymentStatus::COMPLETED),
             ]);
     }
 

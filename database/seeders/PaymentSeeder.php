@@ -16,17 +16,18 @@ class PaymentSeeder extends Seeder
      */
     public function run(): void
     {
-        $loans = Loan::whereIn('status', [
-            LoanStatus::APPROVED,
-        ])->get();
+        $loans = Loan::whereIn('status', [LoanStatus::APPROVED])->get();
 
         foreach ($loans as $loan) {
             $schedule = collect($loan->payment_schedule);
-            // Calculate half of the schedule length
             $numberOfPayments = (int) ceil($schedule->count() / 2);
 
             foreach (range(1, $numberOfPayments) as $i) {
-                $scheduledPayment = $schedule[$i - 1];
+                $scheduledPayment = $schedule[$i - 1] ?? null;
+                if (! $scheduledPayment) {
+                    continue;
+                }
+
                 $status = $i <= $numberOfPayments
                     ? PaymentStatus::COMPLETED
                     : PaymentStatus::PENDING;
@@ -38,26 +39,28 @@ class PaymentSeeder extends Seeder
 
                         return [
                             'payment_method' => $method->value,
-                            'received_bank' => $method === PaymentMethod::CASH ? null : fake()->randomElement(['ABC Bank', 'XYZ Bank', 'City Bank']),
-                            'payment_reference' => $method === PaymentMethod::CASH ? null : fake()->unique()->regexify('[A-Z0-9]{10}'),
+                            'received_bank' => $method === PaymentMethod::CASH
+                                ? null
+                                : fake()->randomElement(['ABC Bank', 'XYZ Bank', 'City Bank']),
+                            'payment_reference' => $method === PaymentMethod::CASH
+                                ? null
+                                : fake()->unique()->regexify('[A-Z0-9]{10}'),
                         ];
                     })
-                    ->state([
-                        'status' => $status,
-                    ])
-                    ->create([
-                        'loan_id' => $loan->id,
-                    ]);
+                    ->state(['status' => $status])
+                    ->create(['loan_id' => $loan->id]);
 
                 $updatedSchedule = $schedule->toArray();
                 $updatedSchedule[$i - 1] = array_merge($scheduledPayment, [
                     'status' => $status->value,
                 ]);
 
-                $loan->payment_schedule = $updatedSchedule;
-                $loan->save();
+                // Update the payment_schedule in the loan record
+                $loan->forceFill(['payment_schedule' => $updatedSchedule])->saveQuietly();
+                $loan->refresh();
             }
 
+            // Update loan status after processing payments
             $loan->updateLoanStatus();
         }
     }
