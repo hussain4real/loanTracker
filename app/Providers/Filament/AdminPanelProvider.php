@@ -37,7 +37,7 @@ class AdminPanelProvider extends PanelProvider
             ->registration()
             // ->tenantRegistration(RegisterTeam::class)
             ->colors([
-                'primary' => Color::Amber,
+                'primary' => Color::Teal,
             ])
             ->brandName(config('app.name'))
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
