@@ -16,13 +16,20 @@
             <span class="text-xs text-gray-400 dark:text-gray-200">Loan Amount</span>
             <div class="text-2xl font-semibold text-orange-500 dark:text-orange-400">{{ $getRecord()->amount }}</div>
             <div class="text-xs text-gray-500 dark:text-gray-200">Purpose: {{ $getRecord()->purpose }}</div>
-            @if ($getRecord()->status === 'COMPLETED')
-                <div class="text-xs text-green-500 dark:text-green-400">Completed</div>
-            @elseif ($getRecord()->status === 'OVERDUE')
-                <div class="text-xs text-red-500 dark:text-red-400">Overdue</div>
-            @else
-                <div class="text-xs text-blue-800 dark:text-blue-600 bg-blue-200 dark:bg-blue-100 rounded-md px-1 w-min py-0.5">{{ $getRecord()->status }}</div>
-            @endif
+            @php
+                $status = $getRecord()->status;
+                $colors = $status->getColorClasses();
+            @endphp
+            
+            <div class="inline-flex items-center">
+                <div @class([
+                    'text-xs px-2 py-1 rounded-full font-medium',
+                    $colors['text'],
+                    $colors['bg']
+                ])>
+                    {{ $status->value }}
+                </div>
+            </div>
         </div>
         <div class="text-right space-y-1">
             <span class="text-xs text-gray-400 dark:text-gray-200">
