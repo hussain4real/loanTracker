@@ -7,6 +7,7 @@ use App\Enums\Purpose;
 use App\Filament\Clusters\Finances;
 use App\Filament\Clusters\Finances\Resources\LoanResource\Pages;
 use App\Filament\Clusters\Finances\Resources\LoanResource\RelationManagers\PaymentsRelationManager;
+use App\Filament\Clusters\Finances\Resources\LoanResource\Widgets\LoanOverview;
 use App\Models\Loan;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -166,6 +167,13 @@ class LoanResource extends Resource
             'create' => Pages\CreateLoan::route('/create'),
             'view' => Pages\ViewLoan::route('/{record}'),
             'edit' => Pages\EditLoan::route('/{record}/edit'),
+        ];
+    }
+
+    public static function getWidgets(): array
+    {
+        return [
+            LoanOverview::class,
         ];
     }
 }

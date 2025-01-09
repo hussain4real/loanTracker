@@ -19,6 +19,13 @@ class ViewLoan extends ViewRecord
         ];
     }
 
+    protected function getHeaderWidgets(): array
+    {
+        return [
+            LoanResource\Widgets\LoanOverview::make(),
+        ];
+    }
+
     public function infolist(Infolist $infolist): Infolist
     {
         return $infolist

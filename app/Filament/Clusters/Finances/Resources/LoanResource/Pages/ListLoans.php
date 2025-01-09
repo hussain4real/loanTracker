@@ -3,6 +3,7 @@
 namespace App\Filament\Clusters\Finances\Resources\LoanResource\Pages;
 
 use App\Filament\Clusters\Finances\Resources\LoanResource;
+use App\Filament\Clusters\Finances\Resources\LoanResource\Widgets\LoanOverview;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
 
@@ -14,6 +15,13 @@ class ListLoans extends ListRecords
     {
         return [
             Actions\CreateAction::make(),
+        ];
+    }
+
+    protected function getHeaderWidgets(): array
+    {
+        return [
+            LoanOverview::make(),
         ];
     }
 }

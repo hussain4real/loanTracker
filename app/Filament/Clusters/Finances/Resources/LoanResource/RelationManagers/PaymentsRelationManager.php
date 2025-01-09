@@ -200,7 +200,53 @@ class PaymentsRelationManager extends RelationManager
             ])
             ->actions([
                 Tables\Actions\ViewAction::make(),
-                Tables\Actions\EditAction::make(),
+                Tables\Actions\EditAction::make()
+                    ->before(function (Tables\Actions\EditAction $action, array $data, Model $record) {
+                        $loan = $this->getOwnerRecord();
+                        $paymentSchedule = $loan->payment_schedule ?? [];
+
+                        // Calculate total paid excluding current payment
+                        $totalPaid = $loan->payments()
+                            ->where('status', PaymentStatus::COMPLETED)
+                            ->where('id', '!=', $record->id)
+                            ->sum('amount');
+
+                        // Check if new amount would exceed loan amount
+                        if (($totalPaid + $data['amount']) > $loan->amount) {
+                            Notification::make()
+                                ->warning()
+                                ->title('Payment exceeds loan amount')
+                                ->send();
+                            $action->halt();
+                        }
+
+                        // Get total paid for this month excluding current payment
+                        $monthlyPaid = $loan->payments()
+                            ->where('month', $data['month'])
+                            ->where('status', PaymentStatus::COMPLETED)
+                            ->where('id', '!=', $record->id)
+                            ->sum('amount');
+
+                        // Update schedule status
+                        $updatedSchedule = collect($paymentSchedule)
+                            ->map(function ($payment) use ($data, $monthlyPaid) {
+                                if ($payment['month'] === $data['month']) {
+                                    $totalPaidForMonth = $monthlyPaid + $data['amount'];
+
+                                    return array_merge($payment, [
+                                        'status' => $totalPaidForMonth >= $payment['amount']
+                                            ? PaymentStatus::COMPLETED->value
+                                            : PaymentStatus::PENDING->value,
+                                        'paid_amount' => $totalPaidForMonth,
+                                    ]);
+                                }
+
+                                return $payment;
+                            })
+                            ->toArray();
+
+                        $loan->forceFill(['payment_schedule' => $updatedSchedule])->saveQuietly();
+                    }),
                 // Tables\Actions\DissociateAction::make(),
                 Tables\Actions\DeleteAction::make(),
             ])

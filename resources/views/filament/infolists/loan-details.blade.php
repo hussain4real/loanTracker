@@ -31,7 +31,7 @@ formatAmount(amount) {
                 @endphp
 
                 {{-- Timeline Line --}}
-                <div class="absolute left-9 top-0 h-full w-0.5 bg-gray-200"></div>
+                <div class="absolute left-9 top-0 h-full w-0.5 bg-gray-200 dark:bg-gray-700"></div>
 
                 {{-- Timeline Items --}}
                 @foreach ($schedule as $index => $payment)
@@ -79,9 +79,9 @@ formatAmount(amount) {
                                     selectedPayment = selectedPayment?.month === payment.month ? null : payment;
                                 "
                                 data-payment="{{ json_encode($payment) }}"
-                                class="cursor-pointer rounded-lg border {{ $colors['border'] }} {{ $colors['bg'] }} p-4 transition-all hover:shadow-md"
+                                class="cursor-pointer rounded-lg border {{ $colors['border'] }} {{ $colors['bg'] }} p-4 transition-all hover:shadow-md dark:border-gray-700"
                                 :class="{
-                                    'ring-2': selectedPayment && selectedPayment.month === '{{ $payment['month'] }}',
+                                    'ring-2 dark:ring-offset-gray-900': selectedPayment && selectedPayment.month === '{{ $payment['month'] }}',
                                     '{{ str_replace('border-', 'ring-', $colors['border']) }}': selectedPayment && selectedPayment.month === '{{ $payment['month'] }}'
                                 }"
                             >
@@ -115,37 +115,37 @@ formatAmount(amount) {
             <div 
                 x-show="selectedPayment" 
                 x-transition
-                class="rounded-lg border border-gray-200 bg-white p-4 sm:p-6 shadow-sm sticky top-14"
+                class="rounded-lg border border-gray-200 bg-white dark:bg-gray-800 p-4 sm:p-6 shadow-sm sticky top-16"
             >
                 <template x-if="selectedPayment">
                     <div class="space-y-4">
-                        <h2 class="text-xl font-bold">
+                        <h2 class="text-xl font-bold dark:text-gray-100">
                             <span x-text="selectedPayment.month || 'Unknown'"></span>
                             <span> Payment Details</span>
                         </h2>
                         
                         <div class="grid gap-4">
                             
-                            <div class="rounded-lg bg-gray-50 p-4">
-                                <p class="text-sm text-gray-600">Amount</p>
-                                <p class="text-lg font-bold" x-text="formatAmount(selectedPayment.amount)"></p>
+                            <div class="rounded-lg bg-gray-50 dark:bg-gray-700/50 p-4">
+                                <p class="text-sm text-gray-600 dark:text-gray-400">Amount</p>
+                                <p class="text-lg font-bold dark:text-gray-100" x-text="formatAmount(selectedPayment.amount)"></p>
                             </div>
                                
     
                             <div class="grid grid-cols-2 gap-4">
-                                <div class="rounded-lg bg-gray-50 p-4">
-                                    <p class="text-sm text-gray-600">Due Date</p>
-                                    <p class="font-medium" x-text="formatDate(selectedPayment.due_date)"></p>
+                                <div class="rounded-lg bg-gray-50 dark:bg-gray-700/50 p-4">
+                                    <p class="text-sm text-gray-600 dark:text-gray-400">Due Date</p>
+                                    <p class="font-medium dark:text-gray-200" x-text="formatDate(selectedPayment.due_date)"></p>
                                 </div>
-                                <div class="rounded-lg bg-gray-50 p-4">
-                                    <p class="text-sm text-gray-600">Status</p>
-                                    <p class="font-medium" x-text="selectedPayment.status || 'Unknown'"></p>
+                                <div class="rounded-lg bg-gray-50 dark:bg-gray-700/50 p-4">
+                                    <p class="text-sm text-gray-600 dark:text-gray-400">Status</p>
+                                    <p class="font-medium dark:text-gray-200" x-text="selectedPayment.status || 'Unknown'"></p>
                                 </div>
                             </div>
     
-                            <div class="rounded-lg bg-gray-50 p-4">
-                                <p class="text-sm text-gray-600">Notes</p>
-                                <p class="font-medium" x-text="selectedPayment.notes || 'No notes available'"></p>
+                            <div class="rounded-lg bg-gray-50 dark:bg-gray-700/50 p-4">
+                                <p class="text-sm text-gray-600 dark:text-gray-400">Notes</p>
+                                <p class="font-medium dark:text-gray-200" x-text="selectedPayment.notes || 'No notes available'"></p>
                             </div>
                         </div>
                     </div>
