@@ -6,7 +6,7 @@
             {{ $getRecord()->user?->name }}
         </div>
         <span class="text-sm text-gray-500 dark:text-gray-300">
-            #{{ $getRecord()->id }}
+            #{{ $getRecord()->user?->country }}
         </span>
     </div>
 
@@ -25,7 +25,8 @@
                 <div @class([
                     'text-xs px-2 py-1 rounded-full font-medium',
                     $colors['text'],
-                    $colors['bg']
+                    $colors['bg'],
+                    $colors['border']
                 ])>
                     {{ $status->value }}
                 </div>
