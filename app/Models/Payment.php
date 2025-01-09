@@ -23,6 +23,7 @@ class Payment extends Model
         'received_bank',
         'payment_reference',
         'due_date',
+        'status',
     ];
 
     protected function casts(): array
