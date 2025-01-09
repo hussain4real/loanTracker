@@ -16,14 +16,14 @@ formatAmount(amount) {
     }
  }
 " class="space-y-6">
-    <div class="flex justify-between items-center space-x-1">
+    <div class="flex flex-col sm:flex-row justify-between items-center space-y-2 sm:space-y-0 sm:space-x-1">
        <div class="text-xl font-semibold">Payment Schedule for {{ $getRecord()->user->name }}</div>
        {{-- <pre x-text="JSON.stringify(selectedPayment, null, 2)"></pre> --}}
 
     </div>
-    <div class="grid grid-cols-12 gap-6">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {{-- Timeline Section (Left) --}}
-        <div class="col-span-7">
+        <div class="col-span-1 lg:col-span-7">
             <div class="relative">
                 @php
                     $schedule = $getRecord()->payment_schedule ?? [];
@@ -74,7 +74,9 @@ formatAmount(amount) {
                         {{-- Payment Card --}}
                         <div class="ml-16 w-full">
                             <div 
-                                @click="selectedPayment = JSON.parse($event.target.closest('[data-payment]').dataset.payment);
+                                @click="
+                                    const payment = JSON.parse($event.target.closest('[data-payment]').dataset.payment);
+                                    selectedPayment = selectedPayment?.month === payment.month ? null : payment;
                                 "
                                 data-payment="{{ json_encode($payment) }}"
                                 class="cursor-pointer rounded-lg border {{ $colors['border'] }} {{ $colors['bg'] }} p-4 transition-all hover:shadow-md"
@@ -109,11 +111,11 @@ formatAmount(amount) {
         </div>
 
         {{-- Payment Details Section (Right) --}}
-        <div class="col-span-5">
+        <div class="col-span-1 lg:col-span-5 ">
             <div 
                 x-show="selectedPayment" 
                 x-transition
-                class="rounded-lg border border-gray-200 bg-white p-6 shadow-sm"
+                class="rounded-lg border border-gray-200 bg-white p-4 sm:p-6 shadow-sm sticky top-14"
             >
                 <template x-if="selectedPayment">
                     <div class="space-y-4">
@@ -123,16 +125,12 @@ formatAmount(amount) {
                         </h2>
                         
                         <div class="grid gap-4">
-                            <div class="grid grid-cols-2 gap-4">
-                                <div class="rounded-lg bg-gray-50 p-4">
-                                    <p class="text-sm text-gray-600">Amount Due</p>
-                                    <p class="text-lg font-bold" x-text="formatAmount(selectedPayment.amount)"></p>
-                                </div>
-                                <div class="rounded-lg bg-gray-50 p-4">
-                                    <p class="text-sm text-gray-600">Amount Paid</p>
-                                    <p class="text-lg font-bold" x-text="formatAmount(selectedPayment.amount)"></p>
-                                </div>
+                            
+                            <div class="rounded-lg bg-gray-50 p-4">
+                                <p class="text-sm text-gray-600">Amount</p>
+                                <p class="text-lg font-bold" x-text="formatAmount(selectedPayment.amount)"></p>
                             </div>
+                               
     
                             <div class="grid grid-cols-2 gap-4">
                                 <div class="rounded-lg bg-gray-50 p-4">
