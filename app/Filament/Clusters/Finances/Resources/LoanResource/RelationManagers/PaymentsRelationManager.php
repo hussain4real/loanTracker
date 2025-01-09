@@ -117,13 +117,18 @@ class PaymentsRelationManager extends RelationManager
                     ->date(),
                 Tables\Columns\TextColumn::make('payment_method'),
                 Tables\Columns\TextColumn::make('received_bank')
-                    ->hidden(function (TextColumn $column, Get $get) {
+                    ->hidden(function (TextColumn $column) {
 
                         $state = $column->getState();
 
-                        return $state !== PaymentMethod::BANK_TRANSFER || $state !== PaymentMethod::CHEQUE || $state !== PaymentMethod::MOBILE_MONEY || $state->isEmpty();
+                        return $state !== PaymentMethod::BANK_TRANSFER || $state !== PaymentMethod::CHEQUE || $state !== PaymentMethod::MOBILE_MONEY || $state == null;
                     }),
                 Tables\Columns\TextColumn::make('payment_reference')
+                    ->hidden(function (TextColumn $column) {
+                        $state = $column->getState();
+
+                        return $state == null;
+                    })
                     ->limit(50),
                 Tables\Columns\TextColumn::make('due_date')
                     ->date(),
