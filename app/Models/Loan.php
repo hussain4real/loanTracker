@@ -184,18 +184,17 @@ class Loan extends Model
     // Update loan status based on payments and due dates
     public function updateLoanStatus(): void
     {
-        $pendingPayments = $this->payments()
-            ->where('status', PaymentStatus::PENDING)
-            ->count();
-
+        $outstandingBalance = $this->outstanding_balance;
         $overduePayments = $this->payments()
             ->where('status', PaymentStatus::PENDING)
             ->where('due_date', '<', now())
             ->count();
+
         $this->status = match (true) {
-            $pendingPayments === 0 => LoanStatus::COMPLETED,
-            $overduePayments > 0 => LoanStatus::OVERDUE,
+            $outstandingBalance <= 0 => LoanStatus::COMPLETED,
             $overduePayments > 3 => LoanStatus::DEFAULTED,
+            $overduePayments > 0 => LoanStatus::OVERDUE,
+            $outstandingBalance > 0 => LoanStatus::PENDING,
             default => LoanStatus::APPROVED,
         };
         $this->save();

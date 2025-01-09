@@ -1,12 +1,12 @@
-<div class="flex flex-col max-w-full bg-white shadow-none rounded-lg p-2 space-y-4 dark:bg-gray-800 dark:text-gray-100"
+<div class="flex flex-col max-w-full bg-white shadow-md rounded-lg p-2 space-y-4 dark:bg-gray-800 dark:text-gray-100"
 >
     <!-- Header Section -->
     <div class="flex items-center justify-between space-x-2">
         <div class="text-lg font-semibold text-gray-700 dark:text-gray-200">
-            #{{ $getRecord()->id }}
+            {{ $getRecord()->user?->name }}
         </div>
         <span class="text-sm text-gray-500 dark:text-gray-300">
-            {{ $getRecord()->user?->name }}
+            #{{ $getRecord()->id }}
         </span>
     </div>
 
@@ -70,7 +70,7 @@
                 <path d="M10 2a8 8 0 100 16 8 8 0 000-16zM8 11h2V7H8v4zm0 2h2v-2H8v2z" />
             </svg>
             <span class="text-sm text-gray-500 dark:text-gray-300">
-                Next Due: {{ $getRecord()->next_payment_date->format('Y-m-d') }}</span>
+                Next Due: {{ $getRecord()->next_payment_date?->format('Y-m-d') }}</span>
         </div>
         <div class="text-gray-600 dark:text-gray-300">
             Due Date: {{ $getRecord()->due_date->format('Y-m-d') }}

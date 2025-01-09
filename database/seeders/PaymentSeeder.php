@@ -2,7 +2,11 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use App\Enums\LoanStatus;
+use App\Enums\PaymentMethod;
+use App\Enums\PaymentStatus;
+use App\Models\Loan;
+use App\Models\Payment;
 use Illuminate\Database\Seeder;
 
 class PaymentSeeder extends Seeder
@@ -12,6 +16,49 @@ class PaymentSeeder extends Seeder
      */
     public function run(): void
     {
-        //
+        $loans = Loan::whereIn('status', [
+            LoanStatus::APPROVED,
+        ])->get();
+
+        foreach ($loans as $loan) {
+            $schedule = collect($loan->payment_schedule);
+            // Calculate half of the schedule length
+            $numberOfPayments = (int) ceil($schedule->count() / 2);
+
+            foreach (range(1, $numberOfPayments) as $i) {
+                $scheduledPayment = $schedule[$i - 1];
+                $status = $i <= $numberOfPayments
+                    ? PaymentStatus::COMPLETED
+                    : PaymentStatus::PENDING;
+
+                Payment::factory()
+                    ->fromSchedule()
+                    ->state(function () {
+                        $method = fake()->randomElement(PaymentMethod::cases());
+
+                        return [
+                            'payment_method' => $method->value,
+                            'received_bank' => $method === PaymentMethod::CASH ? null : fake()->randomElement(['ABC Bank', 'XYZ Bank', 'City Bank']),
+                            'payment_reference' => $method === PaymentMethod::CASH ? null : fake()->unique()->regexify('[A-Z0-9]{10}'),
+                        ];
+                    })
+                    ->state([
+                        'status' => $status,
+                    ])
+                    ->create([
+                        'loan_id' => $loan->id,
+                    ]);
+
+                $updatedSchedule = $schedule->toArray();
+                $updatedSchedule[$i - 1] = array_merge($scheduledPayment, [
+                    'status' => $status->value,
+                ]);
+
+                $loan->payment_schedule = $updatedSchedule;
+                $loan->save();
+            }
+
+            $loan->updateLoanStatus();
+        }
     }
 }

@@ -6,6 +6,7 @@ use App\Enums\LoanStatus;
 use App\Enums\Purpose;
 use App\Filament\Clusters\Finances;
 use App\Filament\Clusters\Finances\Resources\LoanResource\Pages;
+use App\Filament\Clusters\Finances\Resources\LoanResource\RelationManagers\PaymentsRelationManager;
 use App\Models\Loan;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -22,11 +23,18 @@ class LoanResource extends Resource
 {
     protected static ?string $model = Loan::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-arrows-pointing-out';
 
     protected static ?string $cluster = Finances::class;
 
     protected static SubNavigationPosition $subNavigationPosition = SubNavigationPosition::Top;
+
+    public static function getPluralModelLabel(): string
+    {
+        $userName = auth()->user()->name;
+
+        return __("Money Loaned by {$userName} to Others");
+    }
 
     public static function form(Form $form): Form
     {
@@ -147,7 +155,7 @@ class LoanResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            PaymentsRelationManager::class,
         ];
     }
 

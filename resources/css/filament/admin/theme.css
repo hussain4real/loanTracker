@@ -1,0 +1,9 @@
+@import "/vendor/filament/filament/resources/css/theme.css";
+
+@config 'tailwind.config.js';
+
+@layer utilities {
+    .fi-ta-record > div > div {
+        @apply py-0 rounded-lg;
+    }
+}

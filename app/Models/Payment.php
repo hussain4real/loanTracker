@@ -28,7 +28,7 @@ class Payment extends Model
     protected function casts(): array
     {
         return [
-            'amount' => 'decimal:15,3',
+            'amount' => 'decimal:3',
             'payment_date' => 'date',
             'due_date' => 'date',
             'payment_method' => PaymentMethod::class,
@@ -46,8 +46,8 @@ class Payment extends Model
         return Attribute::make(
             get: function () {
                 return $this->status === PaymentStatus::PENDING
-                && $this->due_date
-                && $this->due_date->isPast();
+                    && $this->due_date
+                    && $this->due_date->isPast();
             }
         )->shouldCache();
     }
