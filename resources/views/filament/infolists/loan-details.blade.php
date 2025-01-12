@@ -69,7 +69,7 @@ formatAmount(amount) {
 
                     <div class="relative mb-8 flex items-center">
                         {{-- Timeline Dot --}}
-                        <div class="absolute left-9 -ml-1.5 h-3 w-3 rounded-full {{ $colors['icon'] }}"></div>
+                        <div class="absolute left-[2.28rem] -ml-1.5 h-3 w-3 rounded-full {{ $colors['icon'] }}"></div>
 
                         {{-- Payment Card --}}
                         <div class="ml-16 w-full">

@@ -20,6 +20,8 @@ class PaymentScheduleChart extends ChartWidget
 
     protected int|string|array $columnSpan = 'full';
 
+    protected static ?string $maxHeight = '700px';
+
     public ?string $filter = 'all';
 
     protected static ?int $sort = 1;

@@ -18,6 +18,8 @@ class Loanee extends ChartWidget
 
     protected static ?int $sort = 2;
 
+    protected static ?string $maxHeight = '750px';
+
     public ?string $filter = 'all';
 
     public function getHeading(): string|Htmlable|null
@@ -77,8 +79,8 @@ class Loanee extends ChartWidget
                 // green
                 $backgroundColors[] = 'rgba(76, 175, 80, 0.8)';
             } else {
-                // red
-                $backgroundColors[] = 'rgba(244, 67, 54, 0.8)';
+                // Orange
+                $backgroundColors[] = 'rgba(255, 165, 80, 0.8)';
             }
         }
 
@@ -132,6 +134,14 @@ class Loanee extends ChartWidget
                     position: 'bottom'
                 }
             },
+            scales: {
+            x: {
+                display: false
+            },
+            y: {
+                display: false
+            }
+        },
             responsive: true
         }
         JS);
