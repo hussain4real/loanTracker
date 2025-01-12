@@ -10,6 +10,7 @@ use App\Filament\Clusters\Finances\Resources\LoanResource\RelationManagers\Payme
 use App\Filament\Clusters\Finances\Resources\LoanResource\Widgets\LoanOverview;
 use App\Models\Loan;
 use Filament\Forms;
+use Filament\Forms\Components\Grid;
 use Filament\Forms\Form;
 use Filament\Forms\Get;
 use Filament\Forms\Set;
@@ -42,25 +43,35 @@ class LoanResource extends Resource
         return $form
             ->schema([
                 Forms\Components\Select::make('user_id')
+                    ->label(__('Borrower/Client'))
                     ->relationship(name: 'user', titleAttribute: 'name', modifyQueryUsing: fn ($query) => $query->where('id', '!=', auth()->id()))
 
                     ->createOptionForm([
-                        Forms\Components\TextInput::make('name')
-                            ->required(),
-                        Forms\Components\Hidden::make('email')
-                            ->default(function ($state, Get $get) {
+                        Grid::make()
+                            ->schema([
+                                Forms\Components\TextInput::make('name')
+                                    ->required(),
+                                Forms\Components\Hidden::make('email')
+                                    ->default(function ($state, Get $get) {
 
-                                return $get('name').rand(1000, 9999).'@loanee.com';
-                            }),
-                        Forms\Components\Hidden::make('password')
-                            ->default('password'),
-                        Forms\Components\TextInput::make('id_number')
-                            ->label('ID/Passport Number'),
-                        Forms\Components\TextInput::make('phone_number')
-                            ->label('Phone Number'),
-                        Forms\Components\TextInput::make('address')
-                            ->label('Physical Address'),
+                                        return $get('name').rand(1000, 9999).'@loanee.com';
+                                    }),
+                                Forms\Components\Hidden::make('password')
+                                    ->default('password'),
+                                Forms\Components\TextInput::make('id_number')
+                                    ->label('ID/Passport Number'),
+                                Forms\Components\TextInput::make('phone_number')
+                                    ->label('Phone Number'),
+                                Forms\Components\TextInput::make('address')
+                                    ->label('Physical Address'),
+                                Forms\Components\TextInput::make('city')
+                                    ->label('City'),
+                                Forms\Components\TextInput::make('state')
+                                    ->label('State'),
+                                Forms\Components\TextInput::make('country')
+                                    ->label('Country'),
 
+                            ]),
                     ])
                     ->searchable()
                     ->preload(),
