@@ -53,6 +53,7 @@ class Loanee extends ChartWidget
         if ($this->filter !== 'all') {
             $query->where('id', $this->filter);
         }
+
         $users = $query->get();
 
         $labels = [];
@@ -71,16 +72,14 @@ class Loanee extends ChartWidget
 
             if ($paid > 0) {
                 // yellow
-
                 $backgroundColors[] = 'rgba(255, 206, 86, 0.8)';
-            } elseif ($totalLoan == $paid) {
+            } elseif ($paid == $totalLoan) {
                 // green
                 $backgroundColors[] = 'rgba(76, 175, 80, 0.8)';
             } else {
                 // red
                 $backgroundColors[] = 'rgba(244, 67, 54, 0.8)';
             }
-
         }
 
         return [
@@ -89,9 +88,9 @@ class Loanee extends ChartWidget
                     'label' => 'Total Loans',
                     'data' => $loanAmounts,
                     'backgroundColor' => $backgroundColors,
-                    'borderColor' => ['rgba(255, 206, 86, 1)'],
+                    'borderColor' => $backgroundColors,
                     'borderWidth' => 2,
-                    'hoverOffset' => 4,
+                    'userNames' => $labels,
                 ],
                 [
                     'label' => 'Total Paid',
@@ -99,6 +98,7 @@ class Loanee extends ChartWidget
                     'backgroundColor' => ['rgba(76, 175, 80, 0.8)'],
                     'borderColor' => ['rgba(76, 175, 80, 1)'],
                     'borderWidth' => 2,
+                    'userNames' => $labels,
                 ],
             ],
             'labels' => $labels,
@@ -115,21 +115,16 @@ class Loanee extends ChartWidget
         return RawJs::make(<<<'JS'
         {
             plugins: {
-                
                 tooltip: {
                     callbacks: {
                         label: function(context) {
-                            let label = context.dataset.label || '';
-                            if (label) {
-                                label += ': ';
-                            }
-                            if (context.parsed !== null) {
-                                label += new Intl.NumberFormat('en-US', {
-                                    style: 'currency',
-                                    currency: 'USD'
-                                }).format(context.parsed);
-                            }
-                            return label;
+                            const userName = context.dataset.userNames[context.dataIndex];
+                        const amount = new Intl.NumberFormat('en-US', {
+                            style: 'currency',
+                            currency: 'USD'
+                        }).format(context.parsed);
+                        
+                        return `${userName} - ${context.dataset.label}: ${amount}`;
                         }
                     }
                 },
