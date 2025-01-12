@@ -22,6 +22,8 @@ class PaymentScheduleChart extends ChartWidget
 
     public ?string $filter = 'all';
 
+    protected static ?int $sort = 1;
+
     public function getHeading(): string|Htmlable|null
     {
         return __('Loan Payment Schedule');
