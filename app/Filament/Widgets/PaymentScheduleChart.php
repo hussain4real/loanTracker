@@ -5,6 +5,7 @@ namespace App\Filament\Widgets;
 use App\Models\Loan;
 use App\Models\User;
 use Filament\Widgets\ChartWidget;
+use Illuminate\Support\Facades\DB;
 
 class PaymentScheduleChart extends ChartWidget
 {
@@ -19,10 +20,16 @@ class PaymentScheduleChart extends ChartWidget
     protected function getFilters(): ?array
     {
         // Get all users that have loans
-        $users = User::whereHas('loans')->get();
+        $users = User::whereHas('loans')->get(['id', 'name']);
+        // Only select necessary fields and limit to users with loans
+        // $users = DB::table('users')
+        //     ->select('users.id', 'users.name')
+        //     ->join('loans', 'users.id', '=', 'loans.user_id')
+        //     ->distinct()
+        //     ->get();
 
         // Start with an 'all' option
-        $filters = ['all' => 'All Users'];
+        $filters = ['all' => 'All Borrowers'];
 
         // Add each user as a filter option
         foreach ($users as $user) {
@@ -68,6 +75,36 @@ class PaymentScheduleChart extends ChartWidget
                 $paidAmounts[$month] += $paidAmount;
             }
         }
+
+        // Process loans in chunks to reduce memory usage
+        // Loan::query()
+        //     ->when($this->filter !== 'all', function ($query) {
+        //         $query->where('user_id', $this->filter);
+        //     })
+        //     ->select('id', 'payment_schedule')
+        //     ->chunkById(100, function ($loans) use (&$monthlyTotals, &$paidAmounts) {
+        //         foreach ($loans as $loan) {
+        //             $schedule = $loan->payment_schedule;
+
+        //             if (! is_array($schedule)) {
+        //                 continue;
+        //             }
+
+        //             foreach ($schedule as $payment) {
+        //                 $month = $payment['month'];
+        //                 $amount = $payment['amount'];
+        //                 $paidAmount = $payment['paid_amount'] ?? 0;
+
+        //                 if (! isset($monthlyTotals[$month])) {
+        //                     $monthlyTotals[$month] = 0;
+        //                     $paidAmounts[$month] = 0;
+        //                 }
+
+        //                 $monthlyTotals[$month] += $amount;
+        //                 $paidAmounts[$month] += $paidAmount;
+        //             }
+        //         }
+        //     });
 
         // Sort months chronologically
         $months = array_keys($monthlyTotals);
@@ -149,4 +186,10 @@ class PaymentScheduleChart extends ChartWidget
     //         ],
     //     ];
     // }
+
+    // Cache the chart data for 5 minutes to improve performance
+    protected function getCacheLifetime(): ?string
+    {
+        return '5 minutes';
+    }
 }
