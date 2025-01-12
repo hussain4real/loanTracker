@@ -199,4 +199,15 @@ class Loan extends Model
         };
         $this->save();
     }
+
+    protected function amountPaid(): Attribute
+    {
+        return Attribute::make(
+            get: function () {
+                return $this->payments()
+                    ->where('status', PaymentStatus::COMPLETED)
+                    ->sum('amount');
+            }
+        )->shouldCache();
+    }
 }

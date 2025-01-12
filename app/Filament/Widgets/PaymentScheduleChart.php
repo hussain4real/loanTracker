@@ -24,7 +24,7 @@ class PaymentScheduleChart extends ChartWidget
 
     public function getHeading(): string|Htmlable|null
     {
-        return __('Payment Schedule');
+        return __('Loan Payment Schedule');
     }
 
     protected function getFilters(): ?array
@@ -214,12 +214,26 @@ class PaymentScheduleChart extends ChartWidget
                         stacked: false,
                         ticks: {
                             callback: function(value) {
-                                return '$' + value;
+                                return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(value);
                             },
                         },
                     },
                 },
                 plugins: {
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                var label = context.dataset.label || '';
+                                if (label) {
+                                    label += ': ';
+                                }
+                                if (context.parsed.y !== null) {
+                                    label += new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(context.parsed.y);
+                                }
+                                return label;
+                            },
+                        },
+                    },
                     legend: {
                         position: 'bottom',
                     },

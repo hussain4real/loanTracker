@@ -76,6 +76,7 @@ class LoanResource extends Resource
                     ->searchable()
                     ->preload(),
                 Forms\Components\TextInput::make('amount')
+                    ->prefixIcon('heroicon-s-currency-dollar')
                     ->numeric(),
                 Forms\Components\Select::make('purpose')
                     ->options(Purpose::class),
@@ -86,6 +87,7 @@ class LoanResource extends Resource
                 //     ->visible(fn (Get $get) => $get('status') === LoanStatus::APPROVED->value || $get('status') === LoanStatus::ACTIVE->value),
                 Forms\Components\TextInput::make('duration')
                     ->numeric()
+                    ->prefixIcon('heroicon-s-calendar')
                     ->suffix('months')
                     ->live(onBlur: true)
                     ->afterStateUpdated(function (Set $set, $state, Get $get) {
