@@ -4,18 +4,28 @@ namespace App\Filament\Widgets;
 
 use App\Models\Loan;
 use App\Models\User;
+use Filament\Support\RawJs;
 use Filament\Widgets\ChartWidget;
+use Filament\Widgets\Concerns\InteractsWithPageFilters;
+use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Support\Facades\DB;
 
 class PaymentScheduleChart extends ChartWidget
 {
-    protected static ?string $heading = 'Payment Schedule';
+    use InteractsWithPageFilters;
+
+    // protected static ?string $heading = 'Payment Schedule';
 
     protected static ?string $pollingInterval = '300s';
 
     protected int|string|array $columnSpan = 'full';
 
     public ?string $filter = 'all';
+
+    public function getHeading(): string|Htmlable|null
+    {
+        return __('Payment Schedule');
+    }
 
     protected function getFilters(): ?array
     {
@@ -143,6 +153,12 @@ class PaymentScheduleChart extends ChartWidget
                     'backgroundColor' => 'rgba(255, 206, 86, 0.8)', // Yellow with transparency
                     'borderColor' => 'rgba(255, 206, 86, 1)', // Yellow border
                     'borderWidth' => 2,
+                    'hoverBackgroundColor' => 'rgba(255, 206, 86, 1)', // Yellow on hover
+                    'borderRadius' => 2,
+                    // 'barPercentage' => 0.8,
+                    // 'barThickness' => 40,
+                    // 'maxBarThickness' => 50,
+
                 ],
                 [
                     'label' => 'Paid Amount',
@@ -150,8 +166,12 @@ class PaymentScheduleChart extends ChartWidget
                     'backgroundColor' => 'rgba(76, 175, 80, 0.8)', // Green with transparency
                     'borderColor' => 'rgba(76, 175, 80, 1)', // Green border
                     'borderWidth' => 2,
+                    'hoverBackgroundColor' => 'rgba(76, 175, 80, 1)', // Green on hover
+                    'borderRadius' => 2,
+
                 ],
             ],
+
             'labels' => $months,
 
         ];
@@ -163,33 +183,64 @@ class PaymentScheduleChart extends ChartWidget
     }
 
     //
-    // protected function getOptions(): array
-    // {
-    //     return [
-    //         'scales' => [
-    //             'y' => [
-    //                 'ticks' => [
-    //                     'callback' => "function(value) {
-    //                         return '$' + value.toLocaleString();
-    //                     }",
-    //                 ],
-    //             ],
-    //         ],
-    //         'plugins' => [
-    //             'tooltip' => [
-    //                 'callbacks' => [
-    //                     'label' => "function(context) {
-    //                         return context.dataset.label + ': $' + context.parsed.y.toLocaleString();
-    //                     }",
-    //                 ],
-    //             ],
-    //         ],
-    //     ];
-    // }
+    protected function getOptions(): RawJs
+    {
+        // return [
+        //     'indexAxis' => 'x',
+        //     'scales' => [
+        //         'x' => [
+        //             'stacked' => false,
+        //         ],
+        //         'y' => [
+        //             'stacked' => false,
+        //             // i want to append $ to the y-axis
+        //             'ticks' => [
+        //                 'callback' => 'function(value) {
+        //                     return "$" + value;
+        //                 }',
+        //             ],
+        //         ],
+        //     ],
+
+        // ];
+        return RawJs::make(<<<'JS'
+            {
+                indexAxis: 'x',
+                scales: {
+                    x: {
+                        stacked: false,
+                    },
+                    y: {
+                        stacked: false,
+                        ticks: {
+                            callback: function(value) {
+                                return '$' + value;
+                            },
+                        },
+                    },
+                },
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                    },
+                    subtitle: {
+                        display: false,
+                        text: 'toggle between scheduled and paid amounts',
+                    },
+                },
+                responsive: true,
+            }
+            JS);
+    }
 
     // Cache the chart data for 5 minutes to improve performance
     protected function getCacheLifetime(): ?string
     {
         return '5 minutes';
+    }
+
+    public function getDescription(): string|Htmlable|null
+    {
+        return __('This chart shows the scheduled and paid amounts for each month.');
     }
 }
