@@ -64,7 +64,7 @@ class LoanResource extends Resource
                                     ->hint(__('Maximum size: 10MB.'))
                                     ->hintIcon('heroicon-o-information-circle')
                                     ->hintColor('warning')
-                                    ->hintIconTooltip(__('Supported formats: png, jpg, jpeg, gif, svg')),
+                                    ->hintIconTooltip(__('Supported formats: png, webp, jpg, jpeg, gif, svg')),
                                 Forms\Components\TextInput::make('name')
                                     ->translateLabel()
                                     ->required(),

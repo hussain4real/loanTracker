@@ -2,9 +2,24 @@
 >
     <!-- Header Section -->
     <div class="flex items-center justify-between space-x-2">
+        <div class="flex items-center space-x-3">
+        {{-- <div class="flex-shrink-0">
+            @if($getRecord()->user?->profile_photo_url)
+                <img class="h-10 w-10 rounded-full object-cover" 
+                     src="{{ $getRecord()->user->profile_photo_url }}" 
+                     alt="{{ $getRecord()->user?->name }}" />
+            @else
+                <div class="h-10 w-10 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
+                    <span class="text-lg font-medium text-gray-600 dark:text-gray-300">
+                        {{ substr($getRecord()->user?->name ?? '', 0, 1) }}
+                    </span>
+                </div>
+            @endif
+        </div> --}}
         <div class="text-lg font-semibold text-gray-700 dark:text-gray-200">
             {{ $getRecord()->user?->name }}
         </div>
+    </div>
         <span class="text-sm text-gray-500 dark:text-gray-300">
             #{{ $getRecord()->user?->country }}
         </span>
@@ -86,7 +101,20 @@
     </div>
 
     <!-- Edit Button -->
-    <div class="flex justify-end">
+    <div class="flex justify-between items-end">
+        <div class="flex-shrink-0">
+            @if($getRecord()->user?->profile_photo_url)
+                <img class="h-10 w-10 rounded-full object-cover" 
+                     src="{{ $getRecord()->user->profile_photo_url }}" 
+                     alt="{{ $getRecord()->user?->name }}" />
+            @else
+                <div class="h-10 w-10 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
+                    <span class="text-lg font-medium text-gray-600 dark:text-gray-300">
+                        {{ substr($getRecord()->user?->name ?? '', 0, 1) }}
+                    </span>
+                </div>
+            @endif
+        </div>
         <a href="{{ route('filament.admin.finances.resources.loans.edit', $getRecord()->id) }}" 
            class="flex items-center text-white bg-gradient-to-r from-purple-500 to-pink-500 hover:bg-gradient-to-l focus:ring-4 focus:outline-none focus:ring-purple-200 dark:focus:ring-purple-800 font-medium rounded-lg text-sm px-2 py-1 text-center me-0 mb-0">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
@@ -94,6 +122,7 @@
             </svg>
             <span class="ms-2">Edit</span>
         </a>
+     
     </div>
 </div>
 

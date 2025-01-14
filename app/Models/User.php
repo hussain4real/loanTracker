@@ -144,8 +144,12 @@ class User extends Authenticatable implements FilamentUser, HasMedia
     {
         return Attribute::make(
             get: function ($value) {
-                return $this->getFirstMediaUrl('profile_photo') ?? 'https://api.dicebear.com/9.x/bottts/svg?seed='.urlencode($this->first_name.$this->last_name);
-            },
+                if ($this->hasMedia('profile_photo')) {
+                    return $this->getFirstMediaUrl('profile_photo');
+                }
+
+                return 'https://api.dicebear.com/9.x/bottts/svg?seed='.urlencode($this->name);
+            }
         )->shouldCache();
     }
 }
