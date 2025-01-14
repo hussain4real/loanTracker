@@ -54,19 +54,19 @@ class LoanResource extends Resource
                                     ->collection('profile_photo')
                                     ->preserveFilenames()
                                     ->responsiveImages()
-            //            ->conversionsDisk()
+                                    //            ->conversionsDisk()
                                     ->image()
                                     ->visibility('public')
-            //            ->avatar()
+                                    //            ->avatar()
                                     ->imageEditor()
-            //            ->circleCropper()
+                                    //            ->circleCropper()
                                     ->maxSize(1024 * 10)
                                     ->hint(__('Maximum size: 10MB.'))
                                     ->hintIcon('heroicon-o-information-circle')
                                     ->hintColor('warning')
                                     ->hintIconTooltip(__('Supported formats: png, webp, jpg, jpeg, gif, svg')),
                                 Forms\Components\TextInput::make('name')
-                                    ->translateLabel()
+                                    ->label(__('Full Name'))
                                     ->required(),
                                 Forms\Components\Hidden::make('email')
                                     ->default(function ($state, Get $get) {
@@ -82,31 +82,31 @@ class LoanResource extends Resource
                                 Forms\Components\TextInput::make('address')
                                     ->label(__('Physical Address')),
                                 Forms\Components\TextInput::make('city')
-                                    ->translateLabel(),
+                                    ->label(__('City')),
                                 // Forms\Components\TextInput::make('state')
                                 //     ->label('State'),
                                 Forms\Components\TextInput::make('country')
-                                    ->translateLabel(),
+                                    ->label(__('Country')),
 
                             ]),
                     ])
                     ->searchable()
                     ->preload(),
                 Forms\Components\TextInput::make('amount')
-                    ->translateLabel()
+                    ->label(__('Amount'))
                     ->prefix('OMR')
                     ->numeric(),
                 Forms\Components\Select::make('purpose')
-                    ->translateLabel()
+                    ->label(__('Purpose'))
                     ->options(Purpose::class),
                 Forms\Components\Select::make('status')
-                    ->translateLabel()
+                    ->label(__('Status'))
                     ->options(LoanStatus::class)
                     ->live(onBlur: true),
                 // Forms\Components\DatePicker::make('approved_at')
                 //     ->visible(fn (Get $get) => $get('status') === LoanStatus::APPROVED->value || $get('status') === LoanStatus::ACTIVE->value),
                 Forms\Components\TextInput::make('duration')
-                    ->translateLabel()
+                    ->label(__('Duration'))
                     ->numeric()
                     ->prefixIcon('heroicon-s-calendar')
                     ->suffix('months')
@@ -124,7 +124,7 @@ class LoanResource extends Resource
                         }
                     }),
                 Forms\Components\DatePicker::make('due_date')
-                    ->translateLabel(),
+                    ->label(__('Due Date')),
             ]);
     }
 
@@ -136,9 +136,11 @@ class LoanResource extends Resource
                     View::make('filament.tables.loan')
                         ->components([
                             Tables\Columns\TextColumn::make('user.name')
+                                ->label(__('Borrower/Client'))
                                 ->searchable()
                                 ->sortable(),
                             Tables\Columns\TextColumn::make('amount')
+                                ->label(__('Amount'))
                                 ->numeric()
                                 ->sortable(),
                             Tables\Columns\TextColumn::make('purpose')
@@ -147,19 +149,24 @@ class LoanResource extends Resource
                                 ->searchable()
                                 ->sortable(),
                             Tables\Columns\TextColumn::make('approved_at')
+                                ->label(__('Approved At'))
                                 ->date()
                                 ->sortable(),
                             Tables\Columns\TextColumn::make('due_date')
+                                ->label(__('Due Date'))
                                 ->date()
                                 ->sortable(),
                             Tables\Columns\TextColumn::make('duration')
+                                ->label(__('Duration'))
                                 ->numeric()
                                 ->sortable(),
                             Tables\Columns\TextColumn::make('created_at')
+                                ->label(__('Created At'))
                                 ->dateTime()
                                 ->sortable()
                                 ->toggleable(isToggledHiddenByDefault: true),
                             Tables\Columns\TextColumn::make('updated_at')
+                                ->label(__('Updated At'))
                                 ->dateTime()
                                 ->sortable()
                                 ->toggleable(isToggledHiddenByDefault: true),

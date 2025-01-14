@@ -243,7 +243,7 @@ class PaymentScheduleChart extends ChartWidget
                     },
                     subtitle: {
                         display: false,
-                        text: 'toggle between scheduled and paid amounts',
+                        text: 'Toggle between scheduled and paid amounts',
                     },
                 },
                 responsive: true,
