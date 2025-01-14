@@ -6,6 +6,7 @@ namespace App\Models;
 
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Panel;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -16,10 +17,14 @@ use Laravel\Fortify\TwoFactorAuthenticatable;
 use Laravel\Jetstream\HasProfilePhoto;
 use Laravel\Jetstream\HasTeams;
 use Laravel\Sanctum\HasApiTokens;
+use Spatie\Image\Enums\Fit;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
-class User extends Authenticatable implements FilamentUser
+class User extends Authenticatable implements FilamentUser, HasMedia
 {
-    use HasApiTokens;
+    use HasApiTokens, InteractsWithMedia;
 
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory;
@@ -114,5 +119,33 @@ class User extends Authenticatable implements FilamentUser
     public function payments()
     {
         return $this->hasManyThrough(Payment::class, Loan::class, 'user_id', 'loan_id', 'id', 'id');
+    }
+
+    public function registerMediaCollections(): void
+    {
+        $this->addMediaCollection('profile_photo')
+            ->singleFile();
+    }
+
+    public function registerMediaConversions(?Media $media = null): void
+    {
+        $this->addMediaConversion('preview')
+            ->fit(Fit::Contain, 300, 300);
+    }
+
+    public function getFilamentAvatarUrl(): ?string
+    {
+        //        return $this->avatar_url;
+        // use spatie image
+        return $this->profile_photo_url;
+    }
+
+    protected function profilePhotoUrl(): Attribute
+    {
+        return Attribute::make(
+            get: function ($value) {
+                return $this->getFirstMediaUrl('profile_photo') ?? 'https://api.dicebear.com/9.x/bottts/svg?seed='.urlencode($this->first_name.$this->last_name);
+            },
+        )->shouldCache();
     }
 }

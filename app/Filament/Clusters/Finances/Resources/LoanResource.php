@@ -49,6 +49,22 @@ class LoanResource extends Resource
                     ->createOptionForm([
                         Grid::make()
                             ->schema([
+                                Forms\Components\SpatieMediaLibraryFileUpload::make('profile_photo')
+                                    ->label(__('Photo'))
+                                    ->collection('profile_photo')
+                                    ->preserveFilenames()
+                                    ->responsiveImages()
+            //            ->conversionsDisk()
+                                    ->image()
+                                    ->visibility('public')
+            //            ->avatar()
+                                    ->imageEditor()
+            //            ->circleCropper()
+                                    ->maxSize(1024 * 10)
+                                    ->hint(__('Maximum size: 10MB.'))
+                                    ->hintIcon('heroicon-o-information-circle')
+                                    ->hintColor('warning')
+                                    ->hintIconTooltip(__('Supported formats: png, jpg, jpeg, gif, svg')),
                                 Forms\Components\TextInput::make('name')
                                     ->translateLabel()
                                     ->required(),
