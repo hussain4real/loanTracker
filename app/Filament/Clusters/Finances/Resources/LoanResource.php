@@ -50,6 +50,7 @@ class LoanResource extends Resource
                         Grid::make()
                             ->schema([
                                 Forms\Components\TextInput::make('name')
+                                    ->translateLabel()
                                     ->required(),
                                 Forms\Components\Hidden::make('email')
                                     ->default(function ($state, Get $get) {
@@ -59,33 +60,37 @@ class LoanResource extends Resource
                                 Forms\Components\Hidden::make('password')
                                     ->default('password'),
                                 Forms\Components\TextInput::make('id_number')
-                                    ->label('ID/Passport Number'),
+                                    ->label(__('ID/Passport Number')),
                                 Forms\Components\TextInput::make('phone_number')
-                                    ->label('Phone Number'),
+                                    ->label(__('Phone Number')),
                                 Forms\Components\TextInput::make('address')
-                                    ->label('Physical Address'),
+                                    ->label(__('Physical Address')),
                                 Forms\Components\TextInput::make('city')
-                                    ->label('City'),
-                                Forms\Components\TextInput::make('state')
-                                    ->label('State'),
+                                    ->translateLabel(),
+                                // Forms\Components\TextInput::make('state')
+                                //     ->label('State'),
                                 Forms\Components\TextInput::make('country')
-                                    ->label('Country'),
+                                    ->translateLabel(),
 
                             ]),
                     ])
                     ->searchable()
                     ->preload(),
                 Forms\Components\TextInput::make('amount')
-                    ->prefixIcon('heroicon-s-currency-dollar')
+                    ->translateLabel()
+                    ->prefix('OMR')
                     ->numeric(),
                 Forms\Components\Select::make('purpose')
+                    ->translateLabel()
                     ->options(Purpose::class),
                 Forms\Components\Select::make('status')
+                    ->translateLabel()
                     ->options(LoanStatus::class)
                     ->live(onBlur: true),
                 // Forms\Components\DatePicker::make('approved_at')
                 //     ->visible(fn (Get $get) => $get('status') === LoanStatus::APPROVED->value || $get('status') === LoanStatus::ACTIVE->value),
                 Forms\Components\TextInput::make('duration')
+                    ->translateLabel()
                     ->numeric()
                     ->prefixIcon('heroicon-s-calendar')
                     ->suffix('months')
@@ -102,7 +107,8 @@ class LoanResource extends Resource
                             $set('due_date', null); // Handle invalid or zero duration
                         }
                     }),
-                Forms\Components\DatePicker::make('due_date'),
+                Forms\Components\DatePicker::make('due_date')
+                    ->translateLabel(),
             ]);
     }
 

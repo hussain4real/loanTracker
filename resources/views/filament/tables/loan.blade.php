@@ -1,4 +1,4 @@
-<div class="flex flex-col max-w-full bg-white shadow-md rounded-lg p-2 space-y-4 dark:bg-gray-800 dark:text-gray-100"
+<div class="flex flex-col max-w-full p-2 space-y-4 dark:bg-gray-800 dark:text-gray-100"
 >
     <!-- Header Section -->
     <div class="flex items-center justify-between space-x-2">
@@ -14,7 +14,7 @@
     <div class="flex items-center justify-between">
         <div class="space-y-1">
             <span class="text-xs text-gray-400 dark:text-gray-200">Loan Amount</span>
-            <div class="text-2xl font-semibold text-orange-500 dark:text-orange-400">{{ \Number::currency($getRecord()->amount, 'USD') }}</div>
+            <div class="text-2xl font-semibold text-orange-500 dark:text-orange-400">{{ \Number::currency($getRecord()->amount, 'OMR') }}</div>
             <div class="text-xs text-gray-500 dark:text-gray-200">Purpose: {{ $getRecord()->purpose }}</div>
             @php
                 $status = $getRecord()->status;
@@ -32,14 +32,14 @@
                 </div>
             </div>
         </div>
-        <div class="text-right space-y-1">
+        <div class="text-right space-y-1 mt-6">
             <span class="text-xs text-gray-400 dark:text-gray-200">
                 Amount Paid</span>
             <div class="text-2xl font-semibold text-gray-700 dark:text-gray-200">
-                {{ \Number::currency($getRecord()->amount_paid,'USD') }}
+                {{ \Number::currency($getRecord()->amount_paid,'OMR') }}
             </div>
             <div class="text-xs {{ $getRecord()->outstanding_balance > 0 ? 'text-red-500 dark:text-red-400' : 'text-green-500 dark:text-green-400' }}">
-                Balance: {{ \Number::currency($getRecord()->outstanding_balance, 'USD') }}
+                Balance: {{ \Number::currency($getRecord()->outstanding_balance, 'OMR') }}
             </div>
         </div>
     </div>
@@ -56,7 +56,7 @@
                 @foreach ($getRecord()->payments as $payment)
                 <div class="flex justify-between space-x-2 text-xs text-gray-500 dark:text-gray-300">
                     <div>{{ $payment->month }}</div>
-                    <div>Amount: {{ \Number::currency($payment->amount, 'USD') }}</div>
+                    <div>Amount: {{ \Number::currency($payment->amount, 'OMR') }}</div>
                     <div>{{ $payment->status }}</div>
                 </div>
                 @endforeach
@@ -67,7 +67,7 @@
                  style="width: {{ $getRecord()->completion_percentage }}%;"></div>
         </div>
         <div class="text-sm text-amber-500 mb-4 dark:text-amber-400">
-            Monthly: {{ \Number::currency($getRecord()->monthly_installment, 'USD') }} | Duration: {{ $getRecord()->duration }} months
+            Monthly: {{ \Number::currency($getRecord()->monthly_installment, 'OMR') }} | Duration: {{ $getRecord()->duration }} months
         </div>
     </div>
 

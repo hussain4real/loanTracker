@@ -7,6 +7,7 @@ use App\Models\Loan;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Number;
 
 class LoanOverview extends BaseWidget
 {
@@ -31,7 +32,7 @@ class LoanOverview extends BaseWidget
             ->sum('payments_sum_amount');
 
         return [
-            Stat::make('Total Loans', "$ {$this->formatAmount($this->totalLoans)}")
+            Stat::make('Total Loans', "{$this->formatAmount($this->totalLoans)}")
                 ->description('Total fees to be paid')
                 ->descriptionIcon('heroicon-m-banknotes')
                 ->chart($this->getChartData('total'))
@@ -40,7 +41,7 @@ class LoanOverview extends BaseWidget
                     'class' => 'shadow-md transition duration-700 ease-in-out transform hover:-translate-y-1 hover:scale-110',
                     'wire:ignore' => true,
                 ]),
-            Stat::make('Loans Paid', "$ {$this->formatAmount($this->totalPaid)} ")
+            Stat::make('Loans Paid', "{$this->formatAmount($this->totalPaid)} ")
                 ->description('Total fees paid')
                 ->descriptionIcon('heroicon-m-banknotes')
                 ->chart($this->getChartData('paid'))
@@ -49,7 +50,7 @@ class LoanOverview extends BaseWidget
                     'class' => 'shadow-md transition duration-700 ease-in-out transform hover:-translate-y-1 hover:scale-110',
                     'wire:ignore' => true,
                 ]),
-            Stat::make('Loans Unpaid', "$ {$this->formatAmount($this->totalLoans - $this->totalPaid)}")
+            Stat::make('Loans Unpaid', "{$this->formatAmount($this->totalLoans - $this->totalPaid)}")
                 ->description('Total fees unpaid')
                 ->descriptionIcon('heroicon-m-banknotes')
                 ->chart($this->getChartData('unpaid'))
@@ -168,7 +169,8 @@ class LoanOverview extends BaseWidget
     // }
     private function formatAmount(float $amount): string
     {
-        return number_format($amount, 2);
+        // return number_format($amount, 2);
+        return Number::currency($amount, 'OMR');
     }
 
     private function getChartData(string $type): array
