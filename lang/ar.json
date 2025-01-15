@@ -60,5 +60,9 @@
     "Cancelled": "تم الإلغاء",
     "Overdue": "متأخر",
     "Defaulted": "متأخر",
-    "Unknown": "غير معروف"
+    "Unknown": "غير معروف",
+    "Month": "الشهر",
+    "Payment Method": "طريقة الدفع",
+    "Payment Reference": "مرجع الدفع",
+    "Received Bank": "البنك المستلم"
 }

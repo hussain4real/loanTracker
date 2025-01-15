@@ -59,6 +59,10 @@
     "Cancelled": "Cancelled",
     "Overdue": "Overdue",
     "Defaulted": "Defaulted",
-    "Unknown": "Unknown"
+    "Unknown": "Unknown",
+    "Month": "Month",
+    "Payment Method": "Payment Method",
+    "Payment Reference": "Payment Reference",
+    "Received Bank": "Received Bank",
     
 }
