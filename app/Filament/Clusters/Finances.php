@@ -12,4 +12,9 @@ class Finances extends Cluster
     {
         return __('Finances');
     }
+
+    public static function getClusterBreadcrumb(): ?string
+    {
+        return __('Finances');
+    }
 }

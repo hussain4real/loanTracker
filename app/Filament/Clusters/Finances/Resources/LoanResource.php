@@ -39,7 +39,18 @@ class LoanResource extends Resource
     {
         $userName = auth()->user()->name;
 
-        return __("Money Loaned by {$userName} to Others");
+        // return __("Money Loaned by {$userName} to Others");
+        return __('Money Loaned by Dr Khamis to Others');
+    }
+
+    public static function getNavigationLabel(): string
+    {
+        return __('Money Loaned by Dr Khamis to Others');
+    }
+
+    public static function getModelLabel(): string
+    {
+        return __('Loan');
     }
 
     public static function getGlobalSearchResultTitle(Model $record): string|Htmlable
