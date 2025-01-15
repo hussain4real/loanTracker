@@ -2,8 +2,8 @@
     "appName": "نظام إدارة القروض",
     "Borrower/Client": "المقترض/العميل",
     "Photo": "الصورة",
-    "Maximum size": "الحجم الأقصى",
-    "Supported formats": "التنسيق المدعوم",
+    "Maximum size": "الحجم الأقصى: 10MB",
+    "Supported formats": "التنسيق المدعوم: png, webp, jpg, jpeg, gif, svg",
     "Full Name": "الاسم الكامل",
     "ID/Passport Number": "رقم الهوية/جواز السفر",
     "Phone Number": "رقم الهاتف",
@@ -49,5 +49,16 @@
     "Payment Details": "تفاصيل الدفع",
     "Notes": "ملاحظات",
     "Finance": "المالية",
-    "Finances": "الشؤون المالية"
+    "Finances": "الشؤون المالية",
+    "months": "أشهر",
+    "No notes available": "لا تتوفر ملاحظات",
+    "Pending": "قيد الانتظار",
+    "Completed": "مكتمل",
+    "Failed": "فشل",
+    "Approved": "تمت الموافقة",
+    "Rejected": "تم الرفض",
+    "Cancelled": "تم الإلغاء",
+    "Overdue": "متأخر",
+    "Defaulted": "متأخر",
+    "Unknown": "غير معروف"
 }

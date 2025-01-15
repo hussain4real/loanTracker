@@ -36,7 +36,7 @@ class Loanee extends ChartWidget
     {
         $users = User::whereHas('loans')->get(['id', 'name']);
 
-        $filters = ['all' => 'All Borrowers'];
+        $filters = ['all' => __('All Borrowers')];
 
         foreach ($users as $user) {
             $filters[$user->id] = $user->name;
@@ -87,7 +87,7 @@ class Loanee extends ChartWidget
         return [
             'datasets' => [
                 [
-                    'label' => 'Total Loans',
+                    'label' => __('Total Loans'),
                     'data' => $loanAmounts,
                     'backgroundColor' => $backgroundColors,
                     'borderColor' => $backgroundColors,
@@ -95,7 +95,7 @@ class Loanee extends ChartWidget
                     'userNames' => $labels,
                 ],
                 [
-                    'label' => 'Total Paid',
+                    'label' => __('Total Paid'),
                     'data' => $paidAmounts,
                     'backgroundColor' => ['rgba(76, 175, 80, 0.8)'],
                     'borderColor' => ['rgba(76, 175, 80, 1)'],

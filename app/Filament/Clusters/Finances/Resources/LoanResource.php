@@ -96,10 +96,10 @@ class LoanResource extends Resource
                                     ->imageEditor()
                                     //            ->circleCropper()
                                     ->maxSize(1024 * 10)
-                                    ->hint(__('Maximum size: 10MB.'))
+                                    ->hint(__('Maximum size'))
                                     ->hintIcon('heroicon-o-information-circle')
                                     ->hintColor('warning')
-                                    ->hintIconTooltip(__('Supported formats: png, webp, jpg, jpeg, gif, svg')),
+                                    ->hintIconTooltip(__('Supported formats')),
                                 Forms\Components\TextInput::make('name')
                                     ->label(__('Full Name'))
                                     ->required(),
@@ -144,7 +144,7 @@ class LoanResource extends Resource
                     ->label(__('Duration'))
                     ->numeric()
                     ->prefixIcon('heroicon-s-calendar')
-                    ->suffix('months')
+                    ->suffix(__('months'))
                     ->live(onBlur: true)
                     ->afterStateUpdated(function (Set $set, $state, Get $get) {
                         logger('After state updated triggered.', [$state]);

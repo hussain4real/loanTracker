@@ -2,8 +2,8 @@
     "appName": "LoanTracker",
     "Borrower/Client": "Borrower/Client",
     "Photo": "Photo",
-    "Maximum size": "Maximum size",
-    "Supported formats": "Supported formats",
+    "Maximum size": "Maximum size: 10MB",
+    "Supported formats": "Supported formats: png, webp, jpg, jpeg, gif, svg",
     "Full Name": "Full Name",
     "ID/Passport Number": "ID/Passport Number",
     "Phone Number": "Phone Number",
@@ -48,5 +48,17 @@
     "Payment Details": "Payment Details",
     "Notes": "Notes",
     "Finance": "Finance",
-    "Finances": "Finances"
+    "Finances": "Finances",
+    "months": "months",
+    "No notes available": "No notes available",
+    "Pending": "Pending",
+    "Completed": "Completed",
+    "Failed": "Failed",
+    "Approved": "Approved",
+    "Rejected": "Rejected",
+    "Cancelled": "Cancelled",
+    "Overdue": "Overdue",
+    "Defaulted": "Defaulted",
+    "Unknown": "Unknown"
+    
 }
