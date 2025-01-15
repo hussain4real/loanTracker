@@ -1,4 +1,5 @@
 {
+    "appName": "LoanTracker",
     "Borrower/Client": "Borrower/Client",
     "Photo": "Photo",
     "Maximum size": "Maximum size",

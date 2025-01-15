@@ -43,7 +43,7 @@ class PaymentScheduleChart extends ChartWidget
         //     ->get();
 
         // Start with an 'all' option
-        $filters = ['all' => 'All Borrowers'];
+        $filters = ['all' => __('All Borrowers')];
 
         // Add each user as a filter option
         foreach ($users as $user) {
@@ -152,7 +152,7 @@ class PaymentScheduleChart extends ChartWidget
         return [
             'datasets' => [
                 [
-                    'label' => 'Scheduled Amount',
+                    'label' => __('Scheduled Amount'),
                     'data' => $scheduledAmounts,
                     'backgroundColor' => 'rgba(255, 206, 86, 0.8)', // Yellow with transparency
                     'borderColor' => 'rgba(255, 206, 86, 1)', // Yellow border
@@ -165,7 +165,7 @@ class PaymentScheduleChart extends ChartWidget
 
                 ],
                 [
-                    'label' => 'Paid Amount',
+                    'label' => __('Paid Amount'),
                     'data' => $paidAmountsData,
                     'backgroundColor' => 'rgba(76, 175, 80, 0.8)', // Green with transparency
                     'borderColor' => 'rgba(76, 175, 80, 1)', // Green border
@@ -189,24 +189,6 @@ class PaymentScheduleChart extends ChartWidget
     //
     protected function getOptions(): RawJs
     {
-        // return [
-        //     'indexAxis' => 'x',
-        //     'scales' => [
-        //         'x' => [
-        //             'stacked' => false,
-        //         ],
-        //         'y' => [
-        //             'stacked' => false,
-        //             // i want to append $ to the y-axis
-        //             'ticks' => [
-        //                 'callback' => 'function(value) {
-        //                     return "$" + value;
-        //                 }',
-        //             ],
-        //         ],
-        //     ],
-
-        // ];
         return RawJs::make(<<<'JS'
             {
                 indexAxis: 'x',

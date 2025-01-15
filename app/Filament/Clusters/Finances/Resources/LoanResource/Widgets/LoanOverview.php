@@ -32,8 +32,8 @@ class LoanOverview extends BaseWidget
             ->sum('payments_sum_amount');
 
         return [
-            Stat::make('Total Loans', "{$this->formatAmount($this->totalLoans)}")
-                ->description('Total fees to be paid')
+            Stat::make(__('Total Loans'), "{$this->formatAmount($this->totalLoans)}")
+                ->description(__('Total fees to be paid'))
                 ->descriptionIcon('heroicon-m-banknotes')
                 ->chart($this->getChartData('total'))
                 ->color('primary')
@@ -41,8 +41,8 @@ class LoanOverview extends BaseWidget
                     'class' => 'shadow-md transition duration-700 ease-in-out transform hover:-translate-y-1 hover:scale-110',
                     'wire:ignore' => true,
                 ]),
-            Stat::make('Loans Paid', "{$this->formatAmount($this->totalPaid)} ")
-                ->description('Total fees paid')
+            Stat::make(__('Loans Paid'), "{$this->formatAmount($this->totalPaid)} ")
+                ->description(__('Total fees paid'))
                 ->descriptionIcon('heroicon-m-banknotes')
                 ->chart($this->getChartData('paid'))
                 ->color('success')
@@ -50,8 +50,8 @@ class LoanOverview extends BaseWidget
                     'class' => 'shadow-md transition duration-700 ease-in-out transform hover:-translate-y-1 hover:scale-110',
                     'wire:ignore' => true,
                 ]),
-            Stat::make('Loans Unpaid', "{$this->formatAmount($this->totalLoans - $this->totalPaid)}")
-                ->description('Total fees unpaid')
+            Stat::make(__('Loans Unpaid'), "{$this->formatAmount($this->totalLoans - $this->totalPaid)}")
+                ->description(__('Total fees unpaid'))
                 ->descriptionIcon('heroicon-m-banknotes')
                 ->chart($this->getChartData('unpaid'))
                 ->color('warning')
