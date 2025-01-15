@@ -6,5 +6,6 @@ export default {
         './app/Filament/Clusters/Finances/**/*.php',
         './resources/views/filament/clusters/finances/**/*.blade.php',
         './vendor/filament/**/*.blade.php',
+        './vendor/bezhansalleh/filament-language-switch/resources/views/language-switch.blade.php',
     ],
 }

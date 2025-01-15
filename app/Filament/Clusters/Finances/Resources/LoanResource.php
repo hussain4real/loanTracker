@@ -20,12 +20,16 @@ use Filament\Tables;
 use Filament\Tables\Columns\Layout\Stack;
 use Filament\Tables\Columns\Layout\View;
 use Filament\Tables\Table;
+use Illuminate\Contracts\Support\Htmlable;
+use Illuminate\Database\Eloquent\Model;
 
 class LoanResource extends Resource
 {
     protected static ?string $model = Loan::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-arrows-pointing-out';
+
+    protected static ?string $recordTitleAttribute = 'id';
 
     protected static ?string $cluster = Finances::class;
 
@@ -36,6 +40,26 @@ class LoanResource extends Resource
         $userName = auth()->user()->name;
 
         return __("Money Loaned by {$userName} to Others");
+    }
+
+    public static function getGlobalSearchResultTitle(Model $record): string|Htmlable
+    {
+        return $record->user->name;
+    }
+
+    public static function getGloballySearchableAttributes(): array
+    {
+        return [
+            'user.name',
+            'amount',
+            'purpose',
+            'status',
+            'approved_at',
+            'due_date',
+            'duration',
+            'created_at',
+            'updated_at',
+        ];
     }
 
     public static function form(Form $form): Form
