@@ -29,7 +29,7 @@ class LoanResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-arrows-pointing-out';
 
-    protected static ?string $recordTitleAttribute = 'id';
+    protected static ?string $recordTitleAttribute = 'user.name';
 
     protected static ?string $cluster = Finances::class;
 
@@ -70,6 +70,20 @@ class LoanResource extends Resource
             'duration',
             'created_at',
             'updated_at',
+        ];
+    }
+
+    public static function getGlobalSearchResultDetails(Model $record): array
+    {
+        return [
+            __('Amount') => $record->amount,
+            __('Purpose') => $record->purpose,
+            __('Status') => $record->status,
+            __('Approved At') => $record->approved_at->format('Y-m-d'),
+            __('Due Date') => $record->due_date->format('Y-m-d'),
+            __('Duration') => "{$record->duration} months",
+
+            __('Amount Paid') => $record->payments->sum('amount'),
         ];
     }
 
