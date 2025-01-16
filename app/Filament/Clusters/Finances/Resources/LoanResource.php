@@ -21,6 +21,7 @@ use Filament\Tables\Columns\Layout\Stack;
 use Filament\Tables\Columns\Layout\View;
 use Filament\Tables\Table;
 use Illuminate\Contracts\Support\Htmlable;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
 class LoanResource extends Resource
@@ -85,6 +86,11 @@ class LoanResource extends Resource
 
             __('Amount Paid') => $record->payments->sum('amount'),
         ];
+    }
+
+    public static function getGlobalSearchEloquentQuery(): Builder
+    {
+        return parent::getGlobalSearchEloquentQuery()->with(['payments']);
     }
 
     public static function form(Form $form): Form
