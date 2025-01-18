@@ -75,79 +75,69 @@ class PaymentScheduleChart extends ChartWidget
             }
 
             foreach ($schedule as $payment) {
-                $month = $payment['month'];
-                $amount = $payment['amount'];
-                $paidAmount = $payment['paid_amount'] ?? 0;
+                // $month = $payment['month'];
+                // $amount = $payment['amount'];
+                // $paidAmount = $payment['paid_amount'] ?? 0;
 
-                // Aggregate amounts for each month
-                if (! isset($monthlyTotals[$month])) {
-                    $monthlyTotals[$month] = 0;
-                    $paidAmounts[$month] = 0;
+                // // Aggregate amounts for each month
+                // if (! isset($monthlyTotals[$month])) {
+                //     $monthlyTotals[$month] = 0;
+                //     $paidAmounts[$month] = 0;
+                // }
+
+                // $monthlyTotals[$month] += $amount;
+                // $paidAmounts[$month] += $paidAmount;
+
+                // Extract YYYY-MM from due_date
+                $key = \Carbon\Carbon::parse($payment['due_date'])->format('Y-m');
+
+                $amount = $payment['amount'];
+                $paid = $payment['paid_amount'] ?? 0;
+
+                if (! isset($monthlyTotals[$key])) {
+                    $monthlyTotals[$key] = 0;
+                    $paidAmounts[$key] = 0;
                 }
 
-                $monthlyTotals[$month] += $amount;
-                $paidAmounts[$month] += $paidAmount;
+                $monthlyTotals[$key] += $amount;
+                $paidAmounts[$key] += $paid;
             }
         }
+        // Sort chronologically
+        ksort($monthlyTotals);
+        $labels = array_keys($monthlyTotals);
 
-        // Process loans in chunks to reduce memory usage
-        // Loan::query()
-        //     ->when($this->filter !== 'all', function ($query) {
-        //         $query->where('user_id', $this->filter);
-        //     })
-        //     ->select('id', 'payment_schedule')
-        //     ->chunkById(100, function ($loans) use (&$monthlyTotals, &$paidAmounts) {
-        //         foreach ($loans as $loan) {
-        //             $schedule = $loan->payment_schedule;
-
-        //             if (! is_array($schedule)) {
-        //                 continue;
-        //             }
-
-        //             foreach ($schedule as $payment) {
-        //                 $month = $payment['month'];
-        //                 $amount = $payment['amount'];
-        //                 $paidAmount = $payment['paid_amount'] ?? 0;
-
-        //                 if (! isset($monthlyTotals[$month])) {
-        //                     $monthlyTotals[$month] = 0;
-        //                     $paidAmounts[$month] = 0;
-        //                 }
-
-        //                 $monthlyTotals[$month] += $amount;
-        //                 $paidAmounts[$month] += $paidAmount;
-        //             }
-        //         }
-        //     });
+        $scheduledAmounts = array_values($monthlyTotals);
+        $paidAmountsData = array_map(fn ($key) => $paidAmounts[$key], $labels);
 
         // Sort months chronologically
-        $months = array_keys($monthlyTotals);
-        $monthOrder = [
-            'January',
-            'February',
-            'March',
-            'April',
-            'May',
-            'June',
-            'July',
-            'August',
-            'September',
-            'October',
-            'November',
-            'December',
-        ];
-        usort($months, function ($a, $b) use ($monthOrder) {
-            return array_search($a, $monthOrder) - array_search($b, $monthOrder);
-        });
+        // $months = array_keys($monthlyTotals);
+        // $monthOrder = [
+        //     'January',
+        //     'February',
+        //     'March',
+        //     'April',
+        //     'May',
+        //     'June',
+        //     'July',
+        //     'August',
+        //     'September',
+        //     'October',
+        //     'November',
+        //     'December',
+        // ];
+        // usort($months, function ($a, $b) use ($monthOrder) {
+        //     return array_search($a, $monthOrder) - array_search($b, $monthOrder);
+        // });
 
-        // Prepare datasets
-        $scheduledAmounts = array_map(function ($month) use ($monthlyTotals) {
-            return $monthlyTotals[$month];
-        }, $months);
+        // // Prepare datasets
+        // $scheduledAmounts = array_map(function ($month) use ($monthlyTotals) {
+        //     return $monthlyTotals[$month];
+        // }, $months);
 
-        $paidAmountsData = array_map(function ($month) use ($paidAmounts) {
-            return $paidAmounts[$month];
-        }, $months);
+        // $paidAmountsData = array_map(function ($month) use ($paidAmounts) {
+        //     return $paidAmounts[$month];
+        // }, $months);
 
         return [
             'datasets' => [
@@ -176,7 +166,8 @@ class PaymentScheduleChart extends ChartWidget
                 ],
             ],
 
-            'labels' => $months,
+            // 'labels' => $months,
+            'labels' => $labels,
 
         ];
     }
