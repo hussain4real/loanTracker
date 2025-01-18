@@ -7,6 +7,6 @@
         @apply py-0 bg-clip-padding backdrop-filter backdrop-blur-md bg-opacity-50;
     }
     .fi-ta-record {
-       @apply shadow-md border border-gray-100 bg-clip-padding backdrop-filter backdrop-blur-md bg-opacity-50 !important;
+       @apply shadow-md border border-gray-100 bg-clip-padding backdrop-filter backdrop-blur-md bg-opacity-50 dark:bg-opacity-70 dark:border-gray-800;
     }
 }

@@ -13,8 +13,8 @@ class CreateLoan extends CreateRecord
     // {
     //     dd($this->data);
     // }
-    protected function afterCreate(): void
-    {
-        dd($this->record);
-    }
+    // protected function afterCreate(): void
+    // {
+    //     dd($this->record);
+    // }
 }
