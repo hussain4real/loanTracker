@@ -154,17 +154,24 @@ const user = computed(() => page.props.auth.user);
 
 <template>
     <Head title="Loan Tracking System" />
-    <div class="bg-gray-50 dark:bg-gray-900">
-        <div class="container mx-auto px-4 py-16">
+    <div
+        class="relative min-h-screen bg-gradient-to-br from-indigo-100 to-violet-200 dark:from-gray-900 dark:to-gray-800 overflow-hidden"
+    >
+        <!-- Blur background effect -->
+        <div
+            class="absolute inset-0 backdrop-blur-sm bg-white/30 dark:bg-black/30"
+        ></div>
+
+        <div class="relative container mx-auto px-4 py-16 z-10">
             <div class="max-w-7xl mx-auto">
                 <div class="text-center mb-12">
                     <h1
-                        class="text-4xl font-bold text-teal-600 dark:text-teal-400 mb-4"
+                        class="text-4xl font-bold text-teal-800 dark:text-teal-300 mb-4"
                     >
                         Dr. Khamis Al Ajmi Loan Management System
                     </h1>
                     <p
-                        class="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto"
+                        class="text-xl text-gray-700 dark:text-gray-300 max-w-3xl mx-auto"
                     >
                         A comprehensive solution for tracking, managing, and
                         analyzing loan portfolios with precision and efficiency.
@@ -173,9 +180,9 @@ const user = computed(() => page.props.auth.user);
 
                 <div class="grid md:grid-cols-3 gap-6 mb-12">
                     <div
-                        class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md"
+                        class="bg-white/60 dark:bg-gray-800/60 backdrop-blur-lg p-6 rounded-2xl shadow-xl border border-white/20 dark:border-gray-700/20 transform transition hover:scale-105"
                     >
-                        <BookOpen class="w-12 h-12 text-teal-500 mb-4" />
+                        <ShieldCheck class="w-12 h-12 text-teal-600 mb-4" />
                         <h2
                             class="text-xl font-semibold mb-3 text-gray-800 dark:text-white"
                         >
@@ -184,14 +191,14 @@ const user = computed(() => page.props.auth.user);
                         <p class="text-gray-600 dark:text-gray-300">
                             Monitor every aspect of your loan portfolio with
                             detailed tracking of borrowers, loan terms,
-                            repayment schedules, and outstanding balances.
+                            repayment schedules.
                         </p>
                     </div>
 
                     <div
-                        class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md"
+                        class="bg-white/60 dark:bg-gray-800/60 backdrop-blur-lg p-6 rounded-2xl shadow-xl border border-white/20 dark:border-gray-700/20 transform transition hover:scale-105"
                     >
-                        <Calculator class="w-12 h-12 text-green-500 mb-4" />
+                        <Calculator class="w-12 h-12 text-green-600 mb-4" />
                         <h2
                             class="text-xl font-semibold mb-3 text-gray-800 dark:text-white"
                         >
@@ -199,15 +206,14 @@ const user = computed(() => page.props.auth.user);
                         </h2>
                         <p class="text-gray-600 dark:text-gray-300">
                             Powerful analytics tools to assess loan performance,
-                            calculate interest, generate financial reports, and
-                            make data-driven decisions.
+                            calculate interest, generate financial reports.
                         </p>
                     </div>
 
                     <div
-                        class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md"
+                        class="bg-white/60 dark:bg-gray-800/60 backdrop-blur-lg p-6 rounded-2xl shadow-xl border border-white/20 dark:border-gray-700/20 transform transition hover:scale-105"
                     >
-                        <Briefcase class="w-12 h-12 text-purple-500 mb-4" />
+                        <Briefcase class="w-12 h-12 text-purple-600 mb-4" />
                         <h2
                             class="text-xl font-semibold mb-3 text-gray-800 dark:text-white"
                         >
@@ -222,20 +228,20 @@ const user = computed(() => page.props.auth.user);
                 </div>
 
                 <div class="text-center">
-                    <a
+                    <Link
                         v-if="!user"
-                        :href="route('filament.admin.auth.login')"
+                        :href="route('login')"
                         class="px-6 py-3 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition duration-300 inline-block text-lg font-semibold"
                     >
                         Login to Access System
-                    </a>
-                    <a
+                    </Link>
+                    <Link
                         v-else
-                        :href="route('filament.admin.pages.dashboard')"
+                        :href="route('dashboard')"
                         class="px-6 py-3 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition duration-300 inline-block text-lg font-semibold"
                     >
                         Go to Dashboard
-                    </a>
+                    </Link>
                 </div>
             </div>
         </div>
