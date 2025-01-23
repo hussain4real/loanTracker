@@ -26,38 +26,34 @@
     </div>
 
     <!-- Loan Amount and Payment Section -->
-    <div class="flex items-center justify-between">
-        <div class="space-y-1">
+    <div class="flex flex-col items-center space-y-2 sm:flex-row sm:justify-between sm:items-center mb-2">
+        <div>
             <span class="text-xs text-gray-400 dark:text-gray-200">{{ __('Loan Amount') }}</span>
             <div class="text-2xl font-semibold text-orange-500 dark:text-orange-400">{{ \Number::currency($getRecord()->amount, 'OMR') }}</div>
-            <div class="text-xs text-gray-500 dark:text-gray-200">{{__('Purpose')}}: {{ $getRecord()->purpose }}</div>
-            @php
-                $status = $getRecord()->status;
-                $colors = $status->getColorClasses();
-            @endphp
-            
-            <div class="inline-flex items-center">
-                <div @class([
-                    'text-xs px-2 py-1 rounded-full font-medium',
-                    $colors['text'],
-                    $colors['bg'],
-                    $colors['border']
-                ])>
-                    {{ $status->getLabel() }}
-                </div>
-            </div>
         </div>
-        <div class="text-right space-y-1 mt-6">
+        <div>
             <span class="text-xs text-gray-400 dark:text-gray-200">
                 {{__('Amount Paid')}}</span>
             <div class="text-2xl font-semibold text-gray-700 dark:text-gray-200">
                 {{ \Number::currency($getRecord()->amount_paid,'OMR') }}
             </div>
+        </div>
+    </div>
+    <div class="flex items-center justify-between">
+        <div class="space-y-1">
+            <div class="text-xs text-gray-500 dark:text-gray-200">{{__('Purpose')}}: {{ $getRecord()->purpose }}</div>
+          
+        </div>
+        <div class="text-right space-y-1 mt-0">
+            
             <div class="text-xs {{ $getRecord()->outstanding_balance > 0 ? 'text-red-500 dark:text-red-400' : 'text-green-500 dark:text-green-400' }}">
                 {{__('Balance')}}: {{ \Number::currency($getRecord()->outstanding_balance, 'OMR') }}
             </div>
         </div>
     </div>
+ 
+
+  
 
     <!-- Payments Section -->
     <div class="space-y-2">
@@ -114,6 +110,20 @@
                     </span>
                 </div>
             @endif
+        </div>
+        <div class="inline-flex items-center justify-center mt-2">
+            @php
+            $status = $getRecord()->status;
+            $colors = $status->getColorClasses();
+            @endphp
+            <div @class([
+                'text-xs px-2 py-1 rounded-full font-medium',
+                $colors['text'],
+                $colors['bg'],
+                $colors['border']
+            ])>
+                {{ $status->getLabel() }}
+            </div>
         </div>
         <a href="{{ route('filament.admin.finances.resources.loans.edit', $getRecord()->id) }}" 
            class="flex items-center text-white bg-gradient-to-r from-purple-500 to-pink-500 hover:bg-gradient-to-l focus:ring-4 focus:outline-none focus:ring-purple-200 dark:focus:ring-purple-800 font-medium rounded-lg text-sm px-2 py-1 text-center me-0 mb-0">

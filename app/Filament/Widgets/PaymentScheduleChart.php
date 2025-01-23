@@ -20,7 +20,7 @@ class PaymentScheduleChart extends ChartWidget
 
     protected int|string|array $columnSpan = 'full';
 
-    protected static ?string $maxHeight = '700px';
+    protected static ?string $maxHeight = '1000px';
 
     public ?string $filter = 'all';
 
@@ -30,6 +30,10 @@ class PaymentScheduleChart extends ChartWidget
     {
         return __('Loan Payment Schedule');
     }
+
+    protected array $extraBodyAttributes = [
+        'class' => 'hello_boy',
+    ];
 
     protected function getFilters(): ?array
     {
@@ -182,6 +186,8 @@ class PaymentScheduleChart extends ChartWidget
     {
         return RawJs::make(<<<'JS'
             {
+                responsive: true,
+                maintainAspectRatio: false,
                 indexAxis: 'x',
                 scales: {
                     x: {
@@ -218,8 +224,13 @@ class PaymentScheduleChart extends ChartWidget
                         display: false,
                         text: 'Toggle between scheduled and paid amounts',
                     },
+                
                 },
-                responsive: true,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false
+                }
+                
             }
             JS);
     }
