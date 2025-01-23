@@ -9,7 +9,8 @@
     .fi-ta-record {
         @apply shadow-md border border-gray-100 bg-clip-padding backdrop-filter backdrop-blur-md bg-opacity-50 dark:bg-opacity-70 dark:border-gray-800;
     }
-    .fi-color-custom.fi-color-primary canvas {
+
+    canvas {
         @apply h-[18rem] sm:h-[30rem];
     }
 }
