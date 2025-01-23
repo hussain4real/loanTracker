@@ -34,7 +34,7 @@ class AdminPanelProvider extends PanelProvider
             ->id('admin')
             ->path('admin')
             ->login()
-            ->registration()
+            // ->registration()
             // ->tenantRegistration(RegisterTeam::class)
             ->colors([
                 'primary' => Color::Teal,
