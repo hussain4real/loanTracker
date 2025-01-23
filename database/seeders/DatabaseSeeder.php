@@ -15,10 +15,15 @@ class DatabaseSeeder extends Seeder
     {
         // User::factory(10)->withPersonalTeam()->create();
 
+        // User::factory()->withPersonalTeam()->create([
+        //     'name' => 'Super Admin',
+        //     'email' => 'super@admin.com',
+        //     'password' => bcrypt('password'),
+        // ]);
         User::factory()->withPersonalTeam()->create([
-            'name' => 'Super Admin',
-            'email' => 'super@admin.com',
-            'password' => bcrypt('password'),
+            'name' => 'Khamis Al Ajmi',
+            'email' => 'kalajmi@tamkeen-hq.com',
+            'password' => bcrypt('password321'),
         ]);
     }
 }
