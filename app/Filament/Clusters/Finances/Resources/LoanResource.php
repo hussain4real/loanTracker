@@ -20,12 +20,17 @@ use Filament\Tables;
 use Filament\Tables\Columns\Layout\Stack;
 use Filament\Tables\Columns\Layout\View;
 use Filament\Tables\Table;
+use Illuminate\Contracts\Support\Htmlable;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 
 class LoanResource extends Resource
 {
     protected static ?string $model = Loan::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-arrows-pointing-out';
+
+    protected static ?string $recordTitleAttribute = 'user.name';
 
     protected static ?string $cluster = Finances::class;
 
@@ -35,7 +40,57 @@ class LoanResource extends Resource
     {
         $userName = auth()->user()->name;
 
-        return __("Money Loaned by {$userName} to Others");
+        // return __("Money Loaned by {$userName} to Others");
+        return __('Money Loaned by Dr Khamis to Others');
+    }
+
+    public static function getNavigationLabel(): string
+    {
+        return __('Money Loaned by Dr Khamis to Others');
+    }
+
+    public static function getModelLabel(): string
+    {
+        return __('Loan');
+    }
+
+    public static function getGlobalSearchResultTitle(Model $record): string|Htmlable
+    {
+        return $record->user->name;
+    }
+
+    public static function getGloballySearchableAttributes(): array
+    {
+        return [
+            'user.name',
+            'amount',
+            'purpose',
+            'status',
+            'approved_at',
+            'due_date',
+            'duration',
+            'created_at',
+            'updated_at',
+        ];
+    }
+
+    public static function getGlobalSearchResultDetails(Model $record): array
+    {
+        return [
+            __('Amount') => $record->amount,
+            __('Purpose') => $record->purpose,
+            __('Status') => $record->status,
+            __('Approved At') => $record->approved_at->format('Y-m-d'),
+            __('Due Date') => $record->due_date->format('Y-m-d'),
+            __('Duration') => "{$record->duration} months",
+
+            __('Amount Paid') => $record->payments->sum('amount'),
+        ];
+    }
+
+    public static function getGlobalSearchEloquentQuery(): Builder
+    {
+        return parent::getGlobalSearchEloquentQuery()->with(['payments']);
     }
 
     public static function form(Form $form): Form
@@ -49,7 +104,24 @@ class LoanResource extends Resource
                     ->createOptionForm([
                         Grid::make()
                             ->schema([
+                                Forms\Components\SpatieMediaLibraryFileUpload::make('profile_photo')
+                                    ->label(__('Photo'))
+                                    ->collection('profile_photo')
+                                    ->preserveFilenames()
+                                    ->responsiveImages()
+                                    //            ->conversionsDisk()
+                                    ->image()
+                                    ->visibility('public')
+                                    //            ->avatar()
+                                    ->imageEditor()
+                                    //            ->circleCropper()
+                                    ->maxSize(1024 * 10)
+                                    ->hint(__('Maximum size'))
+                                    ->hintIcon('heroicon-o-information-circle')
+                                    ->hintColor('warning')
+                                    ->hintIconTooltip(__('Supported formats')),
                                 Forms\Components\TextInput::make('name')
+                                    ->label(__('Full Name'))
                                     ->required(),
                                 Forms\Components\Hidden::make('email')
                                     ->default(function ($state, Get $get) {
@@ -59,36 +131,40 @@ class LoanResource extends Resource
                                 Forms\Components\Hidden::make('password')
                                     ->default('password'),
                                 Forms\Components\TextInput::make('id_number')
-                                    ->label('ID/Passport Number'),
+                                    ->label(__('ID/Passport Number')),
                                 Forms\Components\TextInput::make('phone_number')
-                                    ->label('Phone Number'),
+                                    ->label(__('Phone Number')),
                                 Forms\Components\TextInput::make('address')
-                                    ->label('Physical Address'),
+                                    ->label(__('Physical Address')),
                                 Forms\Components\TextInput::make('city')
-                                    ->label('City'),
-                                Forms\Components\TextInput::make('state')
-                                    ->label('State'),
+                                    ->label(__('City')),
+                                // Forms\Components\TextInput::make('state')
+                                //     ->label('State'),
                                 Forms\Components\TextInput::make('country')
-                                    ->label('Country'),
+                                    ->label(__('Country')),
 
                             ]),
                     ])
                     ->searchable()
                     ->preload(),
                 Forms\Components\TextInput::make('amount')
-                    ->prefixIcon('heroicon-s-currency-dollar')
+                    ->label(__('Amount'))
+                    ->prefix('OMR')
                     ->numeric(),
                 Forms\Components\Select::make('purpose')
+                    ->label(__('Purpose'))
                     ->options(Purpose::class),
                 Forms\Components\Select::make('status')
+                    ->label(__('Status'))
                     ->options(LoanStatus::class)
                     ->live(onBlur: true),
                 // Forms\Components\DatePicker::make('approved_at')
                 //     ->visible(fn (Get $get) => $get('status') === LoanStatus::APPROVED->value || $get('status') === LoanStatus::ACTIVE->value),
                 Forms\Components\TextInput::make('duration')
+                    ->label(__('Duration'))
                     ->numeric()
                     ->prefixIcon('heroicon-s-calendar')
-                    ->suffix('months')
+                    ->suffix(__('months'))
                     ->live(onBlur: true)
                     ->afterStateUpdated(function (Set $set, $state, Get $get) {
                         logger('After state updated triggered.', [$state]);
@@ -102,7 +178,8 @@ class LoanResource extends Resource
                             $set('due_date', null); // Handle invalid or zero duration
                         }
                     }),
-                Forms\Components\DatePicker::make('due_date'),
+                Forms\Components\DatePicker::make('due_date')
+                    ->label(__('Due Date')),
             ]);
     }
 
@@ -114,9 +191,11 @@ class LoanResource extends Resource
                     View::make('filament.tables.loan')
                         ->components([
                             Tables\Columns\TextColumn::make('user.name')
+                                ->label(__('Borrower/Client'))
                                 ->searchable()
                                 ->sortable(),
                             Tables\Columns\TextColumn::make('amount')
+                                ->label(__('Amount'))
                                 ->numeric()
                                 ->sortable(),
                             Tables\Columns\TextColumn::make('purpose')
@@ -125,19 +204,24 @@ class LoanResource extends Resource
                                 ->searchable()
                                 ->sortable(),
                             Tables\Columns\TextColumn::make('approved_at')
+                                ->label(__('Approved At'))
                                 ->date()
                                 ->sortable(),
                             Tables\Columns\TextColumn::make('due_date')
+                                ->label(__('Due Date'))
                                 ->date()
                                 ->sortable(),
                             Tables\Columns\TextColumn::make('duration')
+                                ->label(__('Duration'))
                                 ->numeric()
                                 ->sortable(),
                             Tables\Columns\TextColumn::make('created_at')
+                                ->label(__('Created At'))
                                 ->dateTime()
                                 ->sortable()
                                 ->toggleable(isToggledHiddenByDefault: true),
                             Tables\Columns\TextColumn::make('updated_at')
+                                ->label(__('Updated At'))
                                 ->dateTime()
                                 ->sortable()
                                 ->toggleable(isToggledHiddenByDefault: true),

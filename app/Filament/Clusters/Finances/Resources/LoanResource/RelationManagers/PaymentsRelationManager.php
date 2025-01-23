@@ -21,11 +21,27 @@ class PaymentsRelationManager extends RelationManager
 {
     protected static string $relationship = 'payments';
 
+    public static function getTitle(Model $ownerRecord, string $pageClass): string
+    {
+        return __('Payments');
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return __('Payment');
+    }
+
+    public static function getModelLabel(): string
+    {
+        return __('Payment');
+    }
+
     public function form(Form $form): Form
     {
         return $form
             ->schema([
                 Forms\Components\TextInput::make('amount')
+                    ->label(__('Amount'))
                     ->default(function () {
                         $loan = $this->getOwnerRecord();
                         $paymentSchedule = $loan->payment_schedule ?? [];
@@ -54,6 +70,7 @@ class PaymentsRelationManager extends RelationManager
                     ->required()
                     ->numeric(),
                 Forms\Components\Select::make('month')
+                    ->label(__('Month'))
                     ->options(function () {
                         $loan = $this->getOwnerRecord();
                         $paymentSchedule = $loan->payment_schedule ?? [];
@@ -71,14 +88,21 @@ class PaymentsRelationManager extends RelationManager
                         return $month ? $month['month'] : null;
                     }),
                 Forms\Components\Select::make('payment_method')
+                    ->label(__('Payment Method'))
                     ->options(PaymentMethod::class)
                     ->live(onBlur: true),
                 Forms\Components\TextInput::make('received_bank')
+                    ->label(__('Received Bank'))
                     ->visible(function (Get $get) {
                         return $get('payment_method') !== PaymentMethod::CASH->value;
                     }),
-                Forms\Components\TextInput::make('payment_reference'),
+                Forms\Components\TextInput::make('payment_reference')
+                    ->label(__('Payment Reference'))
+                    ->visible(function (Get $get) {
+                        return $get('payment_method') !== PaymentMethod::CASH->value;
+                    }),
                 Forms\Components\Datepicker::make('due_date')
+                    ->label(__('Due Date'))
                     ->default(function () {
                         $loan = $this->getOwnerRecord();
                         $paymentSchedule = $loan->payment_schedule ?? [];
@@ -88,6 +112,7 @@ class PaymentsRelationManager extends RelationManager
                         return $month ? $month['due_date'] : null;
                     }),
                 Hidden::make('payment_date')
+                    ->label(__('Payment Date'))
                     ->default(now()->format('Y-m-d'))
                     ->dehydrated(),
 

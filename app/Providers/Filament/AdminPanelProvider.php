@@ -104,5 +104,9 @@ class AdminPanelProvider extends PanelProvider
             PanelsRenderHook::BODY_END,
             fn (): string => Blade::render("@vite('resources/js/app.js')"),
         );
+        // FilamentView::registerRenderHook(
+        //     'before',
+        //     fn (): string => '<html dir="'.(app()->getLocale() === 'ar' ? 'rtl' : 'ltr').'" lang="'.app()->getLocale().'">'
+        // );
     }
 }
