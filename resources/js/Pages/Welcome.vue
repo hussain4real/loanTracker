@@ -228,20 +228,20 @@ const user = computed(() => page.props.auth.user);
                 </div>
 
                 <div class="text-center">
-                    <Link
+                    <a
                         v-if="!user"
-                        :href="route('login')"
+                        :href="route('filament.admin.auth.login')"
                         class="px-6 py-3 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition duration-300 inline-block text-lg font-semibold"
                     >
                         Login to Access System
-                    </Link>
-                    <Link
+                    </a>
+                    <a
                         v-else
-                        :href="route('dashboard')"
+                        :href="route('filament.admin.pages.dashboard')"
                         class="px-6 py-3 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition duration-300 inline-block text-lg font-semibold"
                     >
                         Go to Dashboard
-                    </Link>
+                    </a>
                 </div>
             </div>
         </div>
