@@ -10,6 +10,7 @@ enum PaymentStatus: string implements HasColor, HasLabel
 {
     case PENDING = 'Pending';
     case COMPLETED = 'Completed';
+    case PARTIALLY_PAID = 'Partially Paid';
     case FAILED = 'Failed';
 
     public function getLabel(): ?string
@@ -21,6 +22,7 @@ enum PaymentStatus: string implements HasColor, HasLabel
     {
         return match ($this) {
             self::PENDING => 'gray',
+            self::PARTIALLY_PAID => Color::Yellow,
             self::COMPLETED => Color::Green,
             self::FAILED => 'danger',
         };

@@ -53,41 +53,46 @@ class PaymentsRelationManager extends RelationManager
 
                         // Get first pending payment from schedule
                         $pendingPayment = collect($paymentSchedule)
-                            ->firstWhere('status', PaymentStatus::PENDING->value);
+                            ->where('status', PaymentStatus::PENDING->value)
+                            ->sortBy('sequence_number')
+                            ->first();
 
                         if (! $pendingPayment) {
                             return 0;
                         }
 
-                        // Get total paid amount for this month
-                        $paidAmount = $loan->payments()
-                            ->where('month', $pendingPayment['month'])
-                            ->where('status', PaymentStatus::COMPLETED->value)
-                            ->sum('amount');
-
-                        // Return remaining amount for the month
-                        return max(0, $pendingPayment['amount'] - $paidAmount);
+                        return max(0, $pendingPayment['amount'] - $pendingPayment['amount_paid']);
                     })
                     ->required()
                     ->numeric(),
+
                 Forms\Components\Select::make('month')
                     ->label(__('Month'))
                     ->options(function () {
                         $loan = $this->getOwnerRecord();
                         $paymentSchedule = $loan->payment_schedule ?? [];
-                        // get the first month in the payment schedule where the status is pending
-                        $month = collect($paymentSchedule)->firstWhere('status', PaymentStatus::PENDING);
 
-                        return $month ? [$month['month'] => $month['month']] : Month::class;
+                        return collect($paymentSchedule)
+                            ->where('status', PaymentStatus::PENDING->value)
+                            ->sortBy('sequence_number')
+                            ->mapWithKeys(function ($payment) {
+                                $label = "{$payment['month']} {$payment['year']} (#{$payment['sequence_number']})";
+                                return [$payment['sequence_number'] => $label];
+                            })
+                            ->toArray();
                     })
                     ->default(function () {
                         $loan = $this->getOwnerRecord();
                         $paymentSchedule = $loan->payment_schedule ?? [];
-                        // get the first month in the payment schedule where the status is pending
-                        $month = collect($paymentSchedule)->firstWhere('status', PaymentStatus::PENDING);
 
-                        return $month ? $month['month'] : null;
-                    }),
+                        $pendingPayment = collect($paymentSchedule)
+                            ->where('status', PaymentStatus::PENDING->value)
+                            ->sortBy('sequence_number')
+                            ->first();
+
+                        return $pendingPayment ? $pendingPayment['sequence_number'] : null;
+                    })
+                    ->required(),
                 Forms\Components\Select::make('payment_method')
                     ->label(__('Payment Method'))
                     ->options(PaymentMethod::class)
@@ -128,7 +133,7 @@ class PaymentsRelationManager extends RelationManager
     {
         return $table
             ->recordTitleAttribute('id')
-            ->recordClasses(fn (Model $record) => match ($record->status) {
+            ->recordClasses(fn(Model $record) => match ($record->status) {
                 PaymentStatus::PENDING => 'border-s-2 border-gray-600 dark:border-gray-300',
                 PaymentStatus::FAILED => 'border-s-2 border-orange-600 dark:border-orange-300',
                 PaymentStatus::COMPLETED => 'border-s-2 border-green-600 dark:border-green-300',
@@ -138,7 +143,19 @@ class PaymentsRelationManager extends RelationManager
                 // Tables\Columns\TextColumn::make('id'),
                 Tables\Columns\TextColumn::make('amount')
                     ->numeric(),
-                Tables\Columns\TextColumn::make('month'),
+                Tables\Columns\TextColumn::make('month')
+                    ->formatStateUsing(function ($record) {
+                        $loan = $record->loan;
+                        $schedule = collect($loan->payment_schedule);
+                        $paymentEntry = $schedule->firstWhere('sequence_number', $record->month);
+
+                        if (!$paymentEntry) {
+                            return "Payment #{$record->month}";
+                        }
+
+                        return "{$paymentEntry['month']} {$paymentEntry['year']} (#{$paymentEntry['sequence_number']})";
+                    })
+                    ->description(fn($record) => $record->due_date ? "Due: " . $record->due_date->format('M d, Y') : ''),
                 Tables\Columns\TextColumn::make('payment_date')
                     ->date(),
                 Tables\Columns\TextColumn::make('payment_method'),
@@ -166,113 +183,113 @@ class PaymentsRelationManager extends RelationManager
                 //
             ])
             ->headerActions([
-                Tables\Actions\CreateAction::make()
-                    ->before(function (Tables\Actions\CreateAction $action, array $data) {
-                        $loan = $this->getOwnerRecord();
-                        $paymentSchedule = $loan->payment_schedule ?? [];
+                Tables\Actions\CreateAction::make(),
+                // ->before(function (Tables\Actions\CreateAction $action, array $data) {
+                //     $loan = $this->getOwnerRecord();
+                //     $paymentSchedule = $loan->payment_schedule ?? [];
 
-                        // Check total payments against loan amount
-                        $totalPaid = $loan->payments()
-                            ->where('status', PaymentStatus::COMPLETED)
-                            ->sum('amount');
+                //     // Check total payments against loan amount
+                //     $totalPaid = $loan->payments()
+                //         ->where('status', PaymentStatus::COMPLETED)
+                //         ->sum('amount');
 
-                        if (($totalPaid + $data['amount']) > $loan->amount) {
-                            Notification::make()
-                                ->warning()
-                                ->title('Payment exceeds loan amount')
-                                ->send();
-                            $action->halt();
-                        }
+                //     if (($totalPaid + $data['amount']) > $loan->amount) {
+                //         Notification::make()
+                //             ->warning()
+                //             ->title('Payment exceeds loan amount')
+                //             ->send();
+                //         $action->halt();
+                //     }
 
-                        // Find scheduled payment for month
-                        $scheduledPayment = collect($paymentSchedule)
-                            ->firstWhere('month', $data['month']);
+                //     // Find scheduled payment for month
+                //     $scheduledPayment = collect($paymentSchedule)
+                //         ->firstWhere('month', $data['month']);
 
-                        if (! $scheduledPayment) {
-                            Notification::make()
-                                ->warning()
-                                ->title('Invalid payment month')
-                                ->send();
-                            $action->halt();
-                        }
+                //     if (! $scheduledPayment) {
+                //         Notification::make()
+                //             ->warning()
+                //             ->title('Invalid payment month')
+                //             ->send();
+                //         $action->halt();
+                //     }
 
-                        // Get total paid for this month
-                        $monthlyPaid = $loan->payments()
-                            ->where('month', $data['month'])
-                            ->where('status', PaymentStatus::COMPLETED)
-                            ->sum('amount');
+                //     // Get total paid for this month
+                //     $monthlyPaid = $loan->payments()
+                //         ->where('month', $data['month'])
+                //         ->where('status', PaymentStatus::COMPLETED)
+                //         ->sum('amount');
 
-                        // Update schedule status
-                        $updatedSchedule = collect($paymentSchedule)
-                            ->map(function ($payment) use ($data, $monthlyPaid) {
-                                if ($payment['month'] === $data['month']) {
-                                    $totalPaidForMonth = $monthlyPaid + $data['amount'];
+                //     // Update schedule status
+                //     $updatedSchedule = collect($paymentSchedule)
+                //         ->map(function ($payment) use ($data, $monthlyPaid) {
+                //             if ($payment['month'] === $data['month']) {
+                //                 $totalPaidForMonth = $monthlyPaid + $data['amount'];
 
-                                    return array_merge($payment, [
-                                        'status' => $totalPaidForMonth >= $payment['amount']
-                                            ? PaymentStatus::COMPLETED->value
-                                            : PaymentStatus::PENDING->value,
-                                        'paid_amount' => $totalPaidForMonth,
-                                    ]);
-                                }
+                //                 return array_merge($payment, [
+                //                     'status' => $totalPaidForMonth >= $payment['amount']
+                //                         ? PaymentStatus::COMPLETED->value
+                //                         : PaymentStatus::PENDING->value,
+                //                     'paid_amount' => $totalPaidForMonth,
+                //                 ]);
+                //             }
 
-                                return $payment;
-                            })
-                            ->toArray();
+                //             return $payment;
+                //         })
+                //         ->toArray();
 
-                        $loan->forceFill(['payment_schedule' => $updatedSchedule])->saveQuietly();
-                    }),
+                //     $loan->forceFill(['payment_schedule' => $updatedSchedule])->saveQuietly();
+                // }),
                 // Tables\Actions\AssociateAction::make(),
             ])
             ->actions([
                 Tables\Actions\ViewAction::make(),
-                Tables\Actions\EditAction::make()
-                    ->before(function (Tables\Actions\EditAction $action, array $data, Model $record) {
-                        $loan = $this->getOwnerRecord();
-                        $paymentSchedule = $loan->payment_schedule ?? [];
+                Tables\Actions\EditAction::make(),
+                // ->before(function (Tables\Actions\EditAction $action, array $data, Model $record) {
+                //     $loan = $this->getOwnerRecord();
+                //     $paymentSchedule = $loan->payment_schedule ?? [];
 
-                        // Calculate total paid excluding current payment
-                        $totalPaid = $loan->payments()
-                            ->where('status', PaymentStatus::COMPLETED)
-                            ->where('id', '!=', $record->id)
-                            ->sum('amount');
+                //     // Calculate total paid excluding current payment
+                //     $totalPaid = $loan->payments()
+                //         ->where('status', PaymentStatus::COMPLETED)
+                //         ->where('id', '!=', $record->id)
+                //         ->sum('amount');
 
-                        // Check if new amount would exceed loan amount
-                        if (($totalPaid + $data['amount']) > $loan->amount) {
-                            Notification::make()
-                                ->warning()
-                                ->title('Payment exceeds loan amount')
-                                ->send();
-                            $action->halt();
-                        }
+                //     // Check if new amount would exceed loan amount
+                //     if (($totalPaid + $data['amount']) > $loan->amount) {
+                //         Notification::make()
+                //             ->warning()
+                //             ->title('Payment exceeds loan amount')
+                //             ->send();
+                //         $action->halt();
+                //     }
 
-                        // Get total paid for this month excluding current payment
-                        $monthlyPaid = $loan->payments()
-                            ->where('month', $data['month'])
-                            ->where('status', PaymentStatus::COMPLETED)
-                            ->where('id', '!=', $record->id)
-                            ->sum('amount');
+                //     // Get total paid for this month excluding current payment
+                //     $monthlyPaid = $loan->payments()
+                //         ->where('month', $data['month'])
+                //         ->where('status', PaymentStatus::COMPLETED)
+                //         ->where('id', '!=', $record->id)
+                //         ->sum('amount');
 
-                        // Update schedule status
-                        $updatedSchedule = collect($paymentSchedule)
-                            ->map(function ($payment) use ($data, $monthlyPaid) {
-                                if ($payment['month'] === $data['month']) {
-                                    $totalPaidForMonth = $monthlyPaid + $data['amount'];
+                //     // Update schedule status
+                //     $updatedSchedule = collect($paymentSchedule)
+                //         ->map(function ($payment) use ($data, $monthlyPaid) {
+                //             if ($payment['month'] === $data['month']) {
+                //                 $totalPaidForMonth = $monthlyPaid + $data['amount'];
 
-                                    return array_merge($payment, [
-                                        'status' => $totalPaidForMonth >= $payment['amount']
-                                            ? PaymentStatus::COMPLETED->value
-                                            : PaymentStatus::PENDING->value,
-                                        'paid_amount' => $totalPaidForMonth,
-                                    ]);
-                                }
+                //                 return array_merge($payment, [
+                //                     'status' => $totalPaidForMonth >= $payment['amount']
+                //                         ? PaymentStatus::COMPLETED->value
+                //                         : PaymentStatus::PENDING->value,
+                //                     'paid_amount' => $totalPaidForMonth,
+                //                 ]);
+                //             }
 
-                                return $payment;
-                            })
-                            ->toArray();
+                //             return $payment;
+                //         })
+                //         ->toArray();
 
-                        $loan->forceFill(['payment_schedule' => $updatedSchedule])->saveQuietly();
-                    }),
+                //     $loan->forceFill(['payment_schedule' => $updatedSchedule])->saveQuietly();
+                // }),
                 // Tables\Actions\DissociateAction::make(),
                 Tables\Actions\DeleteAction::make(),
             ])

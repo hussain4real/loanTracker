@@ -2,10 +2,10 @@
 
 namespace App\Providers;
 
-use App\Models\Loan;
-use App\Models\Payment;
 use BezhanSalleh\FilamentLanguageSwitch\LanguageSwitch;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Queue\Events\JobProcessing;
+use Illuminate\Support\Facades\Queue;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -29,7 +29,12 @@ class AppServiceProvider extends ServiceProvider
             ])
                 ->visible(outsidePanels: true);
         });
-        Loan::observe(\App\Observers\LoanObserver::class);
-        Payment::observe(\App\Observers\PaymentObserver::class);
+
+        Queue::before(function (JobProcessing $event) {
+            // Set a high timeout for payment schedule generation
+            if (str_contains($event->job->payload()['displayName'] ?? '', 'PaymentObserver')) {
+                $event->job->timeout = 120;
+            }
+        });
     }
 }
