@@ -8,9 +8,9 @@
 formatAmount(amount) {
         return amount ? Number(amount).toLocaleString('en-US', {
             style: 'currency',
-            currency: 'USD',
+            currency: 'OMR',
             minimumFractionDigits: 2
-        }) : '$ 0.00';
+        }) : 'OMR 0.00';
     },
     formatDate(dateString) {
         return dateString ? new Date(dateString).toLocaleDateString('en-US', {
@@ -20,7 +20,7 @@ formatAmount(amount) {
         }) : 'N/A';
     }
  }
-" 
+"
 
 class="space-y-6">
     <div class="flex flex-col sm:flex-row justify-between items-center space-y-2 sm:space-y-0 sm:space-s-1 ">
@@ -45,7 +45,7 @@ class="space-y-6">
                     @php
                         $dueDate = \Carbon\Carbon::parse($payment['due_date']);
                         $status = \App\Enums\PaymentStatus::from($payment['status']);
-                        
+
                         // Define colors based on status
                         $colors = match($status) {
                             \App\Enums\PaymentStatus::COMPLETED => [
@@ -80,7 +80,7 @@ class="space-y-6">
 
                         {{-- Payment Card --}}
                         <div class="ms-16 w-full">
-                            <div 
+                            <div
                                 @click="
                                     const payment = JSON.parse($event.target.closest('[data-payment]').dataset.payment);
                                     selectedPayment = selectedPayment?.month === payment.month ? null : payment;
@@ -104,9 +104,9 @@ class="space-y-6">
                                     <div class="text-end">
                                      @php
                                         $formattedAmount = number_format($payment['amount'], 2);
-                                        $currencyDisplay = app()->getLocale() === 'ar' ? 
-                                            "{$formattedAmount} $" : 
-                                            "$ {$formattedAmount}";
+                                        $currencyDisplay = app()->getLocale() === 'ar' ?
+                                            "{$formattedAmount} OMR" :
+                                            "OMR {$formattedAmount}";
                                     @endphp
                                         <p class="text-lg font-bold {{ $colors['text'] }}">
                                             {{ $currencyDisplay }}
@@ -125,8 +125,8 @@ class="space-y-6">
 
         {{-- Payment Details Section (Right) --}}
         <div class="col-span-1 lg:col-span-5 ">
-            <div 
-                x-show="selectedPayment" 
+            <div
+                x-show="selectedPayment"
                 x-transition
                 class="rounded-lg border border-gray-200 bg-white dark:bg-gray-800 p-4 sm:p-6 shadow-sm sticky top-16"
             >
@@ -136,15 +136,15 @@ class="space-y-6">
                             <span x-text="selectedPayment.month || 'Unknown'"></span>
                             <span> {{__('Payment Details')}}</span>
                         </h2>
-                        
+
                         <div class="grid gap-4">
-                            
+
                             <div class="rounded-lg bg-gray-50 dark:bg-gray-700/50 p-4">
                                 <p class="text-sm text-gray-600 dark:text-gray-400">{{__('Amount')}}</p>
                                 <p class="text-lg font-bold dark:text-gray-100" x-text="formatAmount(selectedPayment.amount)"></p>
                             </div>
-                               
-    
+
+
                             <div class="grid grid-cols-2 gap-4">
                                 <div class="rounded-lg bg-gray-50 dark:bg-gray-700/50 p-4">
                                     <p class="text-sm text-gray-600 dark:text-gray-400">{{__('Due Date')}}</p>
@@ -152,11 +152,11 @@ class="space-y-6">
                                 </div>
                                 <div class="rounded-lg bg-gray-50 dark:bg-gray-700/50 p-4">
                                     <p class="text-sm text-gray-600 dark:text-gray-400">{{__('Status')}}</p>
-                                    <p class="font-medium dark:text-gray-200" x-text="selectedPayment.status ? paymentStatusTranslations[selectedPayment.status] 
+                                    <p class="font-medium dark:text-gray-200" x-text="selectedPayment.status ? paymentStatusTranslations[selectedPayment.status]
                                     : '{{ __('Unknown') }}'"></p>
                                 </div>
                             </div>
-    
+
                             <div class="rounded-lg bg-gray-50 dark:bg-gray-700/50 p-4">
                                 <p class="text-sm text-gray-600 dark:text-gray-400">{{__('Notes')}}</p>
                                 <p class="font-medium dark:text-gray-200" x-text="selectedPayment.notes || '{{__('No notes available')}}'"></p>

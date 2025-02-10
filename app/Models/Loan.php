@@ -151,13 +151,38 @@ class Loan extends Model
         $monthlyPayment = $this->monthly_installment;
         $startDate = Carbon::parse($this->approved_at);
 
+        // Get all existing payments
+        $allPayments = $this->payments()->get();
+        $totalPaid = $allPayments->where('status', PaymentStatus::COMPLETED)->sum('amount');
+        $remainingAmount = max(0, $this->amount - $totalPaid);
+        $cumulativeOutstanding = 0;
+
         for ($i = 1; $i <= $this->duration; $i++) {
+            $monthPaid = $allPayments
+                ->where('month', Carbon::parse($startDate)->format('F'))
+                ->where('status', PaymentStatus::COMPLETED)
+                ->sum('amount');
+
+            $monthOutstanding = max(0, $monthlyPayment - $monthPaid);
+            $cumulativeOutstanding += $monthOutstanding;
+
+            // Determine payment status
+            if ($monthlyPayment == 0 || $monthPaid >= $monthlyPayment) {
+                $status = PaymentStatus::COMPLETED->value;
+            } else {
+                $status = PaymentStatus::PENDING->value;
+            }
+
             $schedule[] = [
                 'month' => Carbon::parse($startDate)->format('F'),
-                'due_date' => $startDate->copy()->endOfMonth()->format('Y-m-d'),
                 'amount' => $monthlyPayment,
-                'status' => PaymentStatus::PENDING->value,
+                'amount_paid' => $monthPaid,
+                'outstanding' => $monthOutstanding,
+                'outstanding_till_date' => $cumulativeOutstanding,
+                'status' => $status,
+                'due_date' => $startDate->copy()->endOfMonth()->format('Y-m-d'),
             ];
+
             $startDate->addMonth();
         }
 
