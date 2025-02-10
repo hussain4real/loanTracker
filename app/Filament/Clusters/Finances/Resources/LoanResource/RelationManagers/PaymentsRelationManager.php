@@ -7,6 +7,7 @@ use App\Enums\PaymentMethod;
 use App\Enums\PaymentStatus;
 use App\Models\Payment;
 use Filament\Forms;
+use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Form;
 use Filament\Forms\Get;
@@ -101,7 +102,7 @@ class PaymentsRelationManager extends RelationManager
                     ->visible(function (Get $get) {
                         return $get('payment_method') !== PaymentMethod::CASH->value;
                     }),
-                Forms\Components\Datepicker::make('due_date')
+                DatePicker::make('due_date')
                     ->label(__('Due Date'))
                     ->default(function () {
                         $loan = $this->getOwnerRecord();
