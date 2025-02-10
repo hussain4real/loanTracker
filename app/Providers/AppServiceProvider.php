@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Models\Loan;
+use App\Models\Payment;
 use BezhanSalleh\FilamentLanguageSwitch\LanguageSwitch;
 use Illuminate\Support\ServiceProvider;
 
@@ -27,5 +29,7 @@ class AppServiceProvider extends ServiceProvider
             ])
                 ->visible(outsidePanels: true);
         });
+        Loan::observe(\App\Observers\LoanObserver::class);
+        Payment::observe(\App\Observers\PaymentObserver::class);
     }
 }
