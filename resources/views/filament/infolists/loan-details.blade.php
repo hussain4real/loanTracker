@@ -140,8 +140,8 @@ class="space-y-6">
                         <div class="grid gap-4">
 
                             <div class="rounded-lg bg-gray-50 dark:bg-gray-700/50 p-4">
-                                <p class="text-sm text-gray-600 dark:text-gray-400">{{__('Amount')}}</p>
-                                <p class="text-lg font-bold dark:text-gray-100" x-text="formatAmount(selectedPayment.amount)"></p>
+                                <p class="text-sm text-gray-600 dark:text-gray-400">{{__('Amount Paid')}}</p>
+                                <p class="text-lg font-bold dark:text-gray-100" x-text="formatAmount(selectedPayment.amount_paid)"></p>
                             </div>
 
 

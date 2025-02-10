@@ -64,5 +64,10 @@
     "Month": "الشهر",
     "Payment Method": "طريقة الدفع",
     "Payment Reference": "مرجع الدفع",
-    "Received Bank": "البنك المستلم"
+    "Received Bank": "البنك المستلم",
+    "Cash": "نقد",
+    "Bank Transfer": "تحويل بنكي",
+    "Cheque": "شيك",
+    "Mobile Money": "المال المحمول",
+    "Other": "آخر"
 }
