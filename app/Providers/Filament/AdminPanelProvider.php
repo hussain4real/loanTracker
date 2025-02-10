@@ -95,6 +95,7 @@ class AdminPanelProvider extends PanelProvider
             //            ->sidebarFullyCollapsibleOnDesktop(true)
             ->topNavigation(false)
             ->collapsibleNavigationGroups(true)
+            ->databaseTransactions(true)
             ->readOnlyRelationManagersOnResourceViewPagesByDefault(false);        // ->tenant(Team::class);
     }
 
